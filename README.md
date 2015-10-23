@@ -1,2 +1,3 @@
 # marioai
-our project is awesome
+CS221 Project
+Mario AI library downloaded from: http://www.marioai.org/
