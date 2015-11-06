@@ -1,6 +1,7 @@
 package ch.idsia.ai.agents;
 
 import wox.serial.Easy;
+import ch.idsia.ai.agents.ai.HelloWorld;
 
 import java.util.*;
 
@@ -26,10 +27,10 @@ public class AgentsPool
 
     public static Agent load (String name) {
         Agent agent;
-        try {
-            agent = (Agent) Class.forName (name).newInstance ();
-        }
-        catch (ClassNotFoundException e) {
+        //try {
+        agent = new HelloWorld("HelloWorld"); //this is very bad, but the only way i got it to work
+        //}
+        /*catch (ClassNotFoundException e) {
             System.out.println (name + " is not a class name; trying to load a wox definition with that name.");
             agent = (Agent) Easy.load (name);
         }
@@ -37,7 +38,7 @@ public class AgentsPool
             e.printStackTrace ();
             agent = null;
             System.exit (1);
-        }
+        }*/
         return agent;
     }
 
