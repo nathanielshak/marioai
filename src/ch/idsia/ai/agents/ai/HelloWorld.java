@@ -57,7 +57,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
         System.out.println("enemies position");
         print1dArray(eposition);
         action[Mario.KEY_RIGHT] = true;
-        //action[Mario.KEY_JUMP] =  observation.mayMarioJump() || !observation.isMarioOnGround();
+        action[Mario.KEY_JUMP] =  observation.mayMarioJump() || !observation.isMarioOnGround();
         return action;
     }
 
