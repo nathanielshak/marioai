@@ -130,6 +130,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
 
         prevObv = observation;
         float[][] features = FeatureExtractor.extractFeatures(prevObv, prevAction);
+        System.out.println("FEATURESSSSS");
         print2dArray(features); 
         float curQ = calcQ(features, weights, prevAction);
         float maxActionVal = -10000000;
@@ -147,6 +148,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
         prevAction = maxAction;
         setAction(maxAction);
         System.out.println("Action = " + maxAction);
+        System.out.println("WEIIIIGGGGHTS");
         print2dArray(weights);
         return action;
 
