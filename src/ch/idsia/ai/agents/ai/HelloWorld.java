@@ -21,10 +21,13 @@ public class HelloWorld extends BasicAIAgent implements Agent
     private static final float DISCOUNT = 1;
     private static final float STEP_SIZE = 1;
 
+    private static final float MODE_WEIGHT = 1000;
+    private static final float PROGRESS_WEIGHT = 10;
 
     private Environment prevObv;
     private int prevAction;
-
+    private float prevXPos = 0;
+    private int prevMarioMode = 2;
 
 
     private float[][] weights = new float[NUM_ACTIONS][NUM_FEATURES];
@@ -101,12 +104,15 @@ public class HelloWorld extends BasicAIAgent implements Agent
         return curQ;
     }
 
-    public static float reward(Environment observation){
+    public float reward(Environment observation){
         /*if(Mario.getStatus() == Mario.STATUS_DEAD){
 
         }*/
-
-        return observation.getMarioFloatPos()[0] + observation.getMarioMode() * 1000;
+        float marioModeScore = (observation.getMarioMode() - prevMarioMode) * MODE_WEIGHT;
+        float marioProgressScore = (observation.getMarioFloatPos()[0] - prevXPos) * PROGRESS_WEIGHT;
+        prevMarioMode = observation.getMarioMode();
+        prevXPos = observation.getMarioFloatPos()[0];
+        return marioModeScore + marioProgressScore;
     }
 
     private void incremementWeights(float error, int action){
@@ -128,7 +134,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
             return action;
         }
 
-        prevObv = observation;
+        //prevObv = observation;
         float[][] features = FeatureExtractor.extractFeatures(prevObv, prevAction);
         System.out.println("FEATURESSSSS");
         print2dArray(features); 
@@ -150,6 +156,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
         System.out.println("Action = " + maxAction);
         System.out.println("WEIIIIGGGGHTS");
         print2dArray(weights);
+        prevObv = observation;
         return action;
 
 
