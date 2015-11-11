@@ -30,6 +30,7 @@ public class AgentsPool
         //try {
         System.out.println("THE NAME IS " + name);
         if(name.equals("ch.idsia.ai.agents.ai.HelloWorld")){
+            System.out.print(name);
             agent = new HelloWorld("HelloWorld"); //this is very bad, but the only way i got it to work
         }
         //}
