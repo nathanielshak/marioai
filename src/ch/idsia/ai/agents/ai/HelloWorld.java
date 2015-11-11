@@ -154,10 +154,13 @@ public class HelloWorld extends BasicAIAgent implements Agent
         incremementWeights(error, prevAction);
         prevAction = maxAction;
         Random randGen = new Random();
-        int pickRand = randGen.nextInt(1);
+        int pickRand = randGen.nextInt(2);
         int chosenAction = maxAction;
         if(pickRand == 1){
             chosenAction = randGen.nextInt(NUM_ACTIONS);
+            System.out.println("RANDOM: " + chosenAction);
+        } else{
+            System.out.println("NOT RANDOM");
         }
         setAction(chosenAction);
         System.out.println("WEIIIIGGGGHTS");
