@@ -129,6 +129,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
             prevObv = observation;
             Random randGen = new Random();
             int randAction = randGen.nextInt(NUM_ACTIONS);
+            System.out.println("RANDOM ACITION:" + randAction);
             prevAction = randAction;
             setAction(randAction);
             return action;
@@ -152,11 +153,17 @@ public class HelloWorld extends BasicAIAgent implements Agent
         float error = curQ - (reward(observation) + DISCOUNT * maxActionVal);
         incremementWeights(error, prevAction);
         prevAction = maxAction;
-        setAction(maxAction);
-        System.out.println("Action = " + maxAction);
+        Random randGen = new Random();
+        int pickRand = randGen.nextInt(1);
+        int chosenAction = maxAction;
+        if(pickRand == 1){
+            chosenAction = randGen.nextInt(NUM_ACTIONS);
+        }
+        setAction(chosenAction);
         System.out.println("WEIIIIGGGGHTS");
         print2dArray(weights);
         prevObv = observation;
+        System.out.println("ACITION:" + chosenAction);
         return action;
 
 
