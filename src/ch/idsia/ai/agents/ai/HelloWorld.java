@@ -17,7 +17,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
     private static final int NOTHING_ACTION = 5;
 
     private static final int NUM_ACTIONS = 5;
-    private static final int NUM_FEATURES = 2;
+    private static final int NUM_FEATURES = 4;
     private static final float DISCOUNT = 1;
     private static final float STEP_SIZE = 1;
 
@@ -46,7 +46,6 @@ public class HelloWorld extends BasicAIAgent implements Agent
 
     public void reset()
     {
-        System.out.println("WERE RESETTING AAAAAHHHH");
         action = new boolean[Environment.numberOfButtons];// Empty action
     }
 
@@ -129,7 +128,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
             prevObv = observation;
             Random randGen = new Random();
             int randAction = randGen.nextInt(NUM_ACTIONS);
-            System.out.println("RANDOM ACITION:" + randAction);
+            //System.out.println("RANDOM ACITION:" + randAction);
             prevAction = randAction;
             setAction(randAction);
             return action;
@@ -137,8 +136,8 @@ public class HelloWorld extends BasicAIAgent implements Agent
 
         //prevObv = observation;
         float[][] features = FeatureExtractor.extractFeatures(prevObv, prevAction);
-        System.out.println("FEATURESSSSS");
-        print2dArray(features); 
+        //System.out.println("FEATURESSSSS");
+        //print2dArray(features); 
         float curQ = calcQ(features, weights, prevAction);
         float maxActionVal = -10000000;
         int maxAction = 0;
@@ -158,15 +157,15 @@ public class HelloWorld extends BasicAIAgent implements Agent
         int chosenAction = maxAction;
         if(pickRand == 1){
             chosenAction = randGen.nextInt(NUM_ACTIONS);
-            System.out.println("RANDOM: " + chosenAction);
+            //System.out.println("RANDOM: " + chosenAction);
         } else{
-            System.out.println("NOT RANDOM");
+            //System.out.println("NOT RANDOM");
         }
         setAction(chosenAction);
-        System.out.println("WEIIIIGGGGHTS");
-        print2dArray(weights);
+        //System.out.println("WEIIIIGGGGHTS");
+        //print2dArray(weights);
         prevObv = observation;
-        System.out.println("ACITION:" + chosenAction);
+        //System.out.println("ACITION:" + chosenAction);
         return action;
 
 
