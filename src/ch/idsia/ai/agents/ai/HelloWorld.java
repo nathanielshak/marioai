@@ -30,6 +30,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
     private float prevXPos = 0;
     private int prevMarioMode = 2;
     private float prevYPos = 0;
+    private int randomRange = 2;
 
 
     private float[][] weights = new float[NUM_ACTIONS][NUM_FEATURES];
@@ -78,19 +79,24 @@ public class HelloWorld extends BasicAIAgent implements Agent
         }
         switch(actionNum){
             case A_ACTION:
+                //System.out.print("JUMP");
                 action[Mario.KEY_JUMP] = true;
                 break;
             case LEFT_ACTION:
+                //System.out.print("LEFT");
                 action[Mario.KEY_LEFT] = true;
                 break;
             case RIGHT_ACTION:
+                //System.out.print("RIGHT");
                 action[Mario.KEY_RIGHT] = true;
                 break;
             case A_RIGHT_ACTION:
+                //System.out.print("JUMP RIGHT");
                 action[Mario.KEY_JUMP] = true;
                 action[Mario.KEY_RIGHT] = true;
                 break;
             case A_LEFT_ACTION:
+                //System.out.print("A LEFT");
                 action[Mario.KEY_LEFT] = true;
                 action[Mario.KEY_JUMP] = true;
                 break;
@@ -99,6 +105,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
 
     private float calcQ(float[][] features, float[][] weights, int action){
         float curQ = 0;
+        System.out.print("ACTION FEATURES: ");
         for(int i = 0; i < NUM_FEATURES; i++){
             curQ += features[action][i] * weights[action][i];
         }
@@ -122,8 +129,8 @@ public class HelloWorld extends BasicAIAgent implements Agent
         {
             prevYPos = observation.getMarioFloatPos()[1];
         }
-        System.out.println(observation.getMarioFloatPos()[0]);
-
+        float reward = marioProgressScore + marioYProgress;
+        System.out.println("REWARD: " + reward);
         return marioProgressScore + marioYProgress;
     }
 
@@ -159,6 +166,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
         float curQ = calcQ(features, weights, prevAction);
         float maxActionVal = -10000000;
         int maxAction = 0;
+        float reward = 0;
         for(int i = 0; i < NUM_ACTIONS; i++)
         {
             float[][] curFeatures = FeatureExtractor.extractFeatures(observation, i);
@@ -166,24 +174,29 @@ public class HelloWorld extends BasicAIAgent implements Agent
             if(qValue > maxActionVal) {
                 maxActionVal = qValue;
                 maxAction = i;
+                reward = maxActionVal;
             }
         }
+        System.out.println(reward);
         float error = curQ - (reward(observation) + DISCOUNT * maxActionVal);
         incremementWeights(error, prevAction);
         prevAction = maxAction;
         Random randGen = new Random();
-        int pickRand = randGen.nextInt(5);
+        int pickRand = randGen.nextInt(3);
         int chosenAction = maxAction;
+        System.out.println("MAX ACTION: " + chosenAction);
         if(pickRand == 1)
         {
             chosenAction = randGen.nextInt(NUM_ACTIONS);
-            //System.out.println("RANDOM: " + chosenAction);
+            System.out.println("RANDOM: " + chosenAction);
         } else{
-            //System.out.println("NOT RANDOM");
+            
         }
         setAction(chosenAction);
-        //System.out.println("WEIIIIGGGGHTS");
-        //print2dArray(weights);
+        System.out.println("WEIIIIGGGGHTS");
+        print2dArray(weights);
+        System.out.println("FEATURES");
+        print2dArray(features);
         prevObv = observation;
         //System.out.println("ACITION:" + chosenAction);
 
