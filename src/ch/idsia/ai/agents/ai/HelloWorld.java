@@ -17,7 +17,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
     private static final int NOTHING_ACTION = 5;
 
     private static final int NUM_ACTIONS = 5;
-    private static final int NUM_FEATURES = 11;
+    private static final int NUM_FEATURES = 12;
     private static final double DISCOUNT = 1;
     private static final double STEP_SIZE = 0.2;
 
@@ -30,8 +30,11 @@ public class HelloWorld extends BasicAIAgent implements Agent
     private double prevXPos = 0;
     private int prevMarioMode = 2;
     private double prevYPos = 0;
-    private int randomRange = 2;
+    private int randomRange = 5;
     private int trial = 0;
+
+    private Random randGen = new Random();
+
 
 
     private double[][] weights = new double[NUM_ACTIONS][NUM_FEATURES];
@@ -54,7 +57,8 @@ public class HelloWorld extends BasicAIAgent implements Agent
     {
         action = new boolean[Environment.numberOfButtons];// Empty action
         System.out.println("RESET Weights: ");
-        randomRange ++;
+        print2dArray(weights);
+        //randomRange ++;
     }
 
     private void print2dArray(double[][] arr){
@@ -119,16 +123,18 @@ public class HelloWorld extends BasicAIAgent implements Agent
         double marioProgressScore = (observation.getMarioFloatPos()[0] - prevXPos - 1) * PROGRESS_WEIGHT;
         prevMarioMode = observation.getMarioMode();
         prevXPos = observation.getMarioFloatPos()[0];
-        double marioYProgress = (prevYPos - observation.getMarioFloatPos()[1] - 1) * Y_PROGRESS_WEIGHT;
+        double marioYProgress = (prevYPos - observation.getMarioFloatPos()[1]) * Y_PROGRESS_WEIGHT;
         if(observation.isMarioOnGround())
         {
             prevYPos = observation.getMarioFloatPos()[1];
+        } else{
+            marioYProgress = 0;
         }
         double reward = marioProgressScore + marioYProgress;
         return marioProgressScore + marioYProgress;
     }
     private void printWeights(double[][] vec){
-        System.out.println("WEIGHTS");
+        //System.out.println("WEIGHTS");
         for(int i = 0; i< vec.length; i++)
         {
             double sum = 0;
@@ -136,7 +142,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
             {
                 sum += vec[i][j];
             }
-            System.out.println("action = " + i + " weight = " + sum);
+            //System.out.println("action = " + i + " weight = " + sum);
         }
     }
 
@@ -147,6 +153,12 @@ public class HelloWorld extends BasicAIAgent implements Agent
         }
     }
 
+    private boolean uselessAction(int action, Environment observation){
+        if((action == A_LEFT_ACTION || action == A_RIGHT_ACTION || action == A_ACTION) && !observation.mayMarioJump()){
+            return true;
+        }
+        return false;   
+    }
 
 
     public boolean[] getAction(Environment observation)
@@ -174,9 +186,16 @@ public class HelloWorld extends BasicAIAgent implements Agent
         double reward = 0;
         for(int i = 0; i < NUM_ACTIONS; i++)
         {
+            //System.out.println("Mario can jump? " + observation.mayMarioJump());
+            //System.out.println("checking action: " + i);
+            if(uselessAction(i, observation)){
+                //System.out.println("WE GOT A USELESS ACTION: " + i);
+                continue;
+            }
             double[][] curFeatures = FeatureExtractor.extractFeatures(observation, i);
             double qValue = calcQ(curFeatures, weights, i);
-            if(qValue > maxActionVal) {
+            //System.out.println("Q = " + qValue);
+            if(qValue >= maxActionVal) {
                 maxActionVal = qValue;
                 maxAction = i;
                 reward = maxActionVal;
@@ -185,17 +204,17 @@ public class HelloWorld extends BasicAIAgent implements Agent
         double error = curQ - (reward(observation) + DISCOUNT * maxActionVal);
         incremementWeights(error, prevAction);
         prevAction = maxAction;
-        Random randGen = new Random();
         int pickRand = randGen.nextInt(randomRange);
         int chosenAction = maxAction;
         if(pickRand == 1)
         {
-            System.out.println("RAND ACTION: " + chosenAction);
+            //System.out.println("RAND ACTION: " + chosenAction);
             chosenAction = randGen.nextInt(NUM_ACTIONS);
             //System.out.println("RANDOM: " + chosenAction);
         } else{
-            System.out.println("MAX ACTION: " + chosenAction);
+            //System.out.println("MAX ACTION: " + chosenAction);
         }
+        //System.out.println("REWARD: " + reward);
         printWeights(weights);
         setAction(chosenAction);
         prevObv = observation;

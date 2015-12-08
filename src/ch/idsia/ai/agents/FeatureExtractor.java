@@ -12,7 +12,7 @@ public class FeatureExtractor {
 	private static final Point MARIO_LOCATION = new Point(11,11);
 	private static final int LEDGE = -10;
 	private static final int PIPE = 2;
-	private static final int doubleING_LEDGE = -11;
+	private static final int FLOATING_LEDGE = -11;
 	private static final int SMALL_LEDGE_RANGE = 1;
 	private static final int MEDIUM_LEDGE_RANGE = 2;
 	private static final int CLOSE_TO_LEDGE_BEGIN = 2;
@@ -20,7 +20,7 @@ public class FeatureExtractor {
 
 	//Features
 	private static final int NUM_ACTIONS = 5;
-	private static final int NUM_FEATURES =11;
+	private static final int NUM_FEATURES =13;
 
 	//Features Indices
 	private static final int ON_GROUND = 0;
@@ -34,6 +34,8 @@ public class FeatureExtractor {
 	private static final int MARIO_IN_FRONT_LEDGE = 8;
 	private static final int MARIO_CLOSE_TO_LEDGE = 9;
 	private static final int MARIO_NOT_CLOSE_TO_LEDGE = 10;
+	private static final int IN_FRONT_OF_LEDGE_JUMPED = 11;
+	private static final int AIR_FACING_LEDGE = 12;
 
 
 	//Stuff *Come back and name this*
@@ -121,10 +123,10 @@ public class FeatureExtractor {
     }
 
     private static boolean MarioIsStuck(float currXPos, boolean facingLedge){
-    	return (prevMarioPos == currXPos) && facingLedge;
+    	return (prevMarioPos == currXPos) & facingLedge;
     }
 
-    private static int LedgeRange(byte[][] levelScene, boolean facingLedge){
+    private static int DistanceToLedge(byte[][] levelScene, boolean facingLedge){
     	if(!facingLedge)
     	{
     		return 0;
@@ -141,6 +143,35 @@ public class FeatureExtractor {
     		}
     	}
     	return 3;
+    }
+
+    private static boolean inFrontOfLedgeJumped(Environment observation, boolean facingLedge, byte[][] levelScene){
+    	if(observation.isMarioOnGround() || facingLedge){
+    		return false;
+    	}
+    	int ledgeBelow = levelScene.length;
+    	int ledgeInFront = levelScene.length;
+
+    	for(int y = MARIO_LOCATION.y - 2; y < levelScene.length; y++){
+    		if(levelScene[y][MARIO_LOCATION.x] == LEDGE || levelScene[y][MARIO_LOCATION.x] == PIPE){
+    			ledgeBelow = y;
+    			break;
+    		}
+    	}
+    	for(int xOffset = 1; xOffset <= 3; xOffset++){
+	    	for(int y = MARIO_LOCATION.y - 2; y < levelScene.length; y++){
+	    		if(levelScene[y][MARIO_LOCATION.x + xOffset] == LEDGE || levelScene[y][MARIO_LOCATION.x + xOffset] == PIPE){
+	    			if(y < ledgeInFront){
+	    				ledgeInFront = y;
+	    			}
+	    			break;
+	    		}
+	    	}
+		}
+    	if (ledgeInFront < ledgeBelow){
+    		System.out.println("AHAHAHAHKDFJDSJGFDSKNGERKLSGSDKLFHNSDLGKNSDKNGV");
+    	}
+    	return (ledgeInFront < ledgeBelow);
     }
 
 	public static double[][] extractFeatures(Environment observation, int action) {
@@ -172,9 +203,16 @@ public class FeatureExtractor {
 
 		//Ledge distance
 		
-		features[action][MARIO_IN_FRONT_LEDGE] = LedgeRange(levelScene, facingLedge) == 1 ? 1:0;
-		features[action][MARIO_CLOSE_TO_LEDGE] = LedgeRange(levelScene, facingLedge) == 2 ? 1:0;
-		features[action][MARIO_NOT_CLOSE_TO_LEDGE] = LedgeRange(levelScene, facingLedge) == 3 ? 1:0;
+		features[action][MARIO_IN_FRONT_LEDGE] = DistanceToLedge(levelScene, facingLedge) == 1 ? 1:0;
+		features[action][MARIO_CLOSE_TO_LEDGE] = DistanceToLedge(levelScene, facingLedge) == 2 ? 1:0;
+		features[action][MARIO_NOT_CLOSE_TO_LEDGE] = DistanceToLedge(levelScene, facingLedge) == 3 ? 1:0;
+
+		//Jumped facing ledge
+		features[action][IN_FRONT_OF_LEDGE_JUMPED] = inFrontOfLedgeJumped(observation, facingLedge, levelScene) ? 1:0;
+
+		//In air facing ledge
+		features[action][AIR_FACING_LEDGE] = (facingLedge && !observation.isMarioOnGround() && observation.mayMarioJump()) ? 1:0;
+
 		//System.out.print("Printing Level\n");
 		//print2dArray(features);
 		//System.out.print("\n\n\n\n");
