@@ -17,7 +17,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
     private static final int NOTHING_ACTION = 5;
 
     private static final int NUM_ACTIONS = 5;
-    private static final int NUM_FEATURES = 11;
+    private static final int NUM_FEATURES = 12;
     private static final double DISCOUNT = 1;
     private static final double STEP_SIZE = 0.2;
 
@@ -32,6 +32,9 @@ public class HelloWorld extends BasicAIAgent implements Agent
     private double prevYPos = 0;
     private int randomRange = 2;
     private int trial = 0;
+
+    private Random randGen = new Random();
+
 
 
     private double[][] weights = new double[NUM_ACTIONS][NUM_FEATURES];
@@ -147,6 +150,12 @@ public class HelloWorld extends BasicAIAgent implements Agent
         }
     }
 
+    private boolean uselessAction(int action, Environment observation){
+        if((action == A_LEFT_ACTION || action == A_RIGHT_ACTION || action == A_ACTION) && !observation.mayMarioJump()){
+            return true;
+        }
+        return false;   
+    }
 
 
     public boolean[] getAction(Environment observation)
@@ -174,9 +183,16 @@ public class HelloWorld extends BasicAIAgent implements Agent
         double reward = 0;
         for(int i = 0; i < NUM_ACTIONS; i++)
         {
+            System.out.println("Mario can jump? " + observation.mayMarioJump());
+            System.out.println("checking action: " + i);
+            if(uselessAction(i, observation)){
+                System.out.println("WE GOT A USELESS ACTION: " + i);
+                continue;
+            }
             double[][] curFeatures = FeatureExtractor.extractFeatures(observation, i);
             double qValue = calcQ(curFeatures, weights, i);
-            if(qValue > maxActionVal) {
+            System.out.println("Q = " + qValue);
+            if(qValue >= maxActionVal) {
                 maxActionVal = qValue;
                 maxAction = i;
                 reward = maxActionVal;
@@ -185,7 +201,6 @@ public class HelloWorld extends BasicAIAgent implements Agent
         double error = curQ - (reward(observation) + DISCOUNT * maxActionVal);
         incremementWeights(error, prevAction);
         prevAction = maxAction;
-        Random randGen = new Random();
         int pickRand = randGen.nextInt(randomRange);
         int chosenAction = maxAction;
         if(pickRand == 1)
@@ -196,6 +211,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
         } else{
             System.out.println("MAX ACTION: " + chosenAction);
         }
+        System.out.println("REWARD: " + reward);
         printWeights(weights);
         setAction(chosenAction);
         prevObv = observation;
