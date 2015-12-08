@@ -17,17 +17,20 @@ public class HelloWorld extends BasicAIAgent implements Agent
     private static final int NOTHING_ACTION = 5;
 
     private static final int NUM_ACTIONS = 5;
-    private static final int NUM_FEATURES = 2;
+    private static final int NUM_FEATURES = 11;
     private static final float DISCOUNT = 1;
     private static final float STEP_SIZE = 1;
 
     private static final float MODE_WEIGHT = 1000;
-    private static final float PROGRESS_WEIGHT = 10;
+    private static final float PROGRESS_WEIGHT = 1000;
+    private static final float Y_PROGRESS_WEIGHT = 100;
 
     private Environment prevObv;
     private int prevAction;
     private float prevXPos = 0;
     private int prevMarioMode = 2;
+    private float prevYPos = 0;
+    private int randomRange = 2;
 
 
     private float[][] weights = new float[NUM_ACTIONS][NUM_FEATURES];
@@ -46,7 +49,6 @@ public class HelloWorld extends BasicAIAgent implements Agent
 
     public void reset()
     {
-        System.out.println("WERE RESETTING AAAAAHHHH");
         action = new boolean[Environment.numberOfButtons];// Empty action
     }
 
@@ -77,19 +79,24 @@ public class HelloWorld extends BasicAIAgent implements Agent
         }
         switch(actionNum){
             case A_ACTION:
+                //System.out.print("JUMP");
                 action[Mario.KEY_JUMP] = true;
                 break;
             case LEFT_ACTION:
+                //System.out.print("LEFT");
                 action[Mario.KEY_LEFT] = true;
                 break;
             case RIGHT_ACTION:
+                //System.out.print("RIGHT");
                 action[Mario.KEY_RIGHT] = true;
                 break;
             case A_RIGHT_ACTION:
+                //System.out.print("JUMP RIGHT");
                 action[Mario.KEY_JUMP] = true;
                 action[Mario.KEY_RIGHT] = true;
                 break;
             case A_LEFT_ACTION:
+                //System.out.print("A LEFT");
                 action[Mario.KEY_LEFT] = true;
                 action[Mario.KEY_JUMP] = true;
                 break;
@@ -98,6 +105,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
 
     private float calcQ(float[][] features, float[][] weights, int action){
         float curQ = 0;
+        System.out.print("ACTION FEATURES: ");
         for(int i = 0; i < NUM_FEATURES; i++){
             curQ += features[action][i] * weights[action][i];
         }
@@ -109,10 +117,21 @@ public class HelloWorld extends BasicAIAgent implements Agent
 
         }*/
         float marioModeScore = (observation.getMarioMode() - prevMarioMode) * MODE_WEIGHT;
-        float marioProgressScore = (observation.getMarioFloatPos()[0] - prevXPos) * PROGRESS_WEIGHT;
+        float marioProgressScore = (observation.getMarioFloatPos()[0] - prevXPos - 1) * PROGRESS_WEIGHT;
+        if(marioProgressScore < 0)
+        {
+            marioProgressScore *= 20;
+        }
         prevMarioMode = observation.getMarioMode();
         prevXPos = observation.getMarioFloatPos()[0];
-        return marioModeScore + marioProgressScore;
+        float marioYProgress = (prevYPos - observation.getMarioFloatPos()[1] - 1) * Y_PROGRESS_WEIGHT;
+        if(observation.isMarioOnGround())
+        {
+            prevYPos = observation.getMarioFloatPos()[1];
+        }
+        float reward = marioProgressScore + marioYProgress;
+        System.out.println("REWARD: " + reward);
+        return marioProgressScore + marioYProgress;
     }
 
     private void incremementWeights(float error, int action){
@@ -125,48 +144,62 @@ public class HelloWorld extends BasicAIAgent implements Agent
 
     public boolean[] getAction(Environment observation)
     {
-        if(prevObv == null){
-            prevObv = observation;
+        if(prevObv == null)
+        { //first action
+            /*prevObv = observation;
             Random randGen = new Random();
             int randAction = randGen.nextInt(NUM_ACTIONS);
-            System.out.println("RANDOM ACITION:" + randAction);
+            //System.out.println("RANDOM ACITION:" + randAction);
             prevAction = randAction;
-            setAction(randAction);
+            setAction(randAction);*/
+            prevObv = observation;
+            prevAction = A_RIGHT_ACTION;
+            setAction(A_RIGHT_ACTION);
             return action;
         }
 
+
         //prevObv = observation;
         float[][] features = FeatureExtractor.extractFeatures(prevObv, prevAction);
-        System.out.println("FEATURESSSSS");
-        print2dArray(features); 
+        //System.out.println("FEATURESSSSS");
+        //print2dArray(features); 
         float curQ = calcQ(features, weights, prevAction);
         float maxActionVal = -10000000;
         int maxAction = 0;
-        for(int i = 0; i < NUM_ACTIONS; i++){
+        float reward = 0;
+        for(int i = 0; i < NUM_ACTIONS; i++)
+        {
             float[][] curFeatures = FeatureExtractor.extractFeatures(observation, i);
             float qValue = calcQ(curFeatures, weights, i);
             if(qValue > maxActionVal) {
                 maxActionVal = qValue;
                 maxAction = i;
+                reward = maxActionVal;
             }
         }
+        System.out.println(reward);
         float error = curQ - (reward(observation) + DISCOUNT * maxActionVal);
         incremementWeights(error, prevAction);
         prevAction = maxAction;
         Random randGen = new Random();
-        int pickRand = randGen.nextInt(2);
+        int pickRand = randGen.nextInt(3);
         int chosenAction = maxAction;
-        if(pickRand == 1){
+        System.out.println("MAX ACTION: " + chosenAction);
+        if(pickRand == 1)
+        {
             chosenAction = randGen.nextInt(NUM_ACTIONS);
             System.out.println("RANDOM: " + chosenAction);
         } else{
-            System.out.println("NOT RANDOM");
+            
         }
         setAction(chosenAction);
         System.out.println("WEIIIIGGGGHTS");
         print2dArray(weights);
+        System.out.println("FEATURES");
+        print2dArray(features);
         prevObv = observation;
-        System.out.println("ACITION:" + chosenAction);
+        //System.out.println("ACITION:" + chosenAction);
+
         return action;
 
 
