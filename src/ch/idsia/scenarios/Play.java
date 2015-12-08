@@ -34,10 +34,10 @@ public class Play {
         options.setVisualization(true);
         options.setNumberOfTrials(numTrials);
         options.setMatlabFileName("");
-        options.setLevelRandSeed((int) (Math.random () * Integer.MAX_VALUE));
         options.setLevelDifficulty(0);
         task.setOptions(options);
         for(int i = 0; i < numTrials; i++){
+            options.setLevelRandSeed((int) (Math.random () * Integer.MAX_VALUE));
             System.out.println ("Score: " + task.evaluate (controller)[0]);
         }
     }

@@ -20,7 +20,7 @@ public class FeatureExtractor {
 
 	//Features
 	private static final int NUM_ACTIONS = 5;
-	private static final int NUM_FEATURES =12;
+	private static final int NUM_FEATURES =13;
 
 	//Features Indices
 	private static final int ON_GROUND = 0;
@@ -35,6 +35,7 @@ public class FeatureExtractor {
 	private static final int MARIO_CLOSE_TO_LEDGE = 9;
 	private static final int MARIO_NOT_CLOSE_TO_LEDGE = 10;
 	private static final int IN_FRONT_OF_LEDGE_JUMPED = 11;
+	private static final int AIR_FACING_LEDGE = 12;
 
 
 	//Stuff *Come back and name this*
@@ -150,19 +151,27 @@ public class FeatureExtractor {
     	}
     	int ledgeBelow = levelScene.length;
     	int ledgeInFront = levelScene.length;
-    	for(int y = MARIO_LOCATION.y; y < levelScene.length; y++){
+
+    	for(int y = MARIO_LOCATION.y - 2; y < levelScene.length; y++){
     		if(levelScene[y][MARIO_LOCATION.x] == LEDGE || levelScene[y][MARIO_LOCATION.x] == PIPE){
     			ledgeBelow = y;
     			break;
     		}
     	}
-    	for(int y = MARIO_LOCATION.y; y < levelScene.length; y++){
-    		if(levelScene[y][MARIO_LOCATION.x + 1] == LEDGE || levelScene[y][MARIO_LOCATION.x] == PIPE){
-    			ledgeInFront = y;
-    			break;
-    		}
+    	for(int xOffset = 1; xOffset <= 3; xOffset++){
+	    	for(int y = MARIO_LOCATION.y - 2; y < levelScene.length; y++){
+	    		if(levelScene[y][MARIO_LOCATION.x + xOffset] == LEDGE || levelScene[y][MARIO_LOCATION.x + xOffset] == PIPE){
+	    			if(y < ledgeInFront){
+	    				ledgeInFront = y;
+	    			}
+	    			break;
+	    		}
+	    	}
+		}
+    	if (ledgeInFront < ledgeBelow){
+    		System.out.println("AHAHAHAHKDFJDSJGFDSKNGERKLSGSDKLFHNSDLGKNSDKNGV");
     	}
-    	return (ledgeInFront > ledgeBelow);
+    	return (ledgeInFront < ledgeBelow);
     }
 
 	public static double[][] extractFeatures(Environment observation, int action) {
@@ -200,6 +209,9 @@ public class FeatureExtractor {
 
 		//Jumped facing ledge
 		features[action][IN_FRONT_OF_LEDGE_JUMPED] = inFrontOfLedgeJumped(observation, facingLedge, levelScene) ? 1:0;
+
+		//In air facing ledge
+		features[action][AIR_FACING_LEDGE] = (facingLedge && !observation.isMarioOnGround() && observation.mayMarioJump()) ? 1:0;
 
 		//System.out.print("Printing Level\n");
 		//print2dArray(features);
