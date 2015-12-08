@@ -17,22 +17,28 @@ import ch.idsia.tools.EvaluationOptions;
 public class Play {
 
     public static void main(String[] args) {
+
         Agent controller = new HumanKeyboardAgent();
         if (args.length > 0) {
             controller = AgentsPool.load (args[0]);
             AgentsPool.addAgent(controller);
+        }
+        int numTrials = 1;
+        if (args.length > 1){
+            numTrials = Integer.parseInt(args[1]);
         }
         EvaluationOptions options = new CmdLineOptions(new String[0]);
         options.setAgent(controller);
         Task task = new ProgressTask(options);
         options.setMaxFPS(true);
         options.setVisualization(true);
-        options.setNumberOfTrials(1);
+        options.setNumberOfTrials(numTrials);
         options.setMatlabFileName("");
         options.setLevelRandSeed((int) (Math.random () * Integer.MAX_VALUE));
-        options.setLevelDifficulty(3);
+        options.setLevelDifficulty(0);
         task.setOptions(options);
-
-        System.out.println ("Score: " + task.evaluate (controller)[0]);
+        for(int i = 0; i < numTrials; i++){
+            System.out.println ("Score: " + task.evaluate (controller)[0]);
+        }
     }
 }
