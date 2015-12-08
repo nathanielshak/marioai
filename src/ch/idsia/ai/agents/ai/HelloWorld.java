@@ -18,22 +18,23 @@ public class HelloWorld extends BasicAIAgent implements Agent
 
     private static final int NUM_ACTIONS = 5;
     private static final int NUM_FEATURES = 11;
-    private static final float DISCOUNT = 1;
-    private static final float STEP_SIZE = 1;
+    private static final double DISCOUNT = 1;
+    private static final double STEP_SIZE = 0.2;
 
-    private static final float MODE_WEIGHT = 1000;
-    private static final float PROGRESS_WEIGHT = 1000;
-    private static final float Y_PROGRESS_WEIGHT = 100;
+    private static final double MODE_WEIGHT = 0;
+    private static final double PROGRESS_WEIGHT = 5;
+    private static final double Y_PROGRESS_WEIGHT = 1;
 
     private Environment prevObv;
     private int prevAction;
-    private float prevXPos = 0;
+    private double prevXPos = 0;
     private int prevMarioMode = 2;
-    private float prevYPos = 0;
+    private double prevYPos = 0;
     private int randomRange = 2;
+    private int trial = 0;
 
 
-    private float[][] weights = new float[NUM_ACTIONS][NUM_FEATURES];
+    private double[][] weights = new double[NUM_ACTIONS][NUM_FEATURES];
 
     public HelloWorld(String s)
     {
@@ -44,15 +45,19 @@ public class HelloWorld extends BasicAIAgent implements Agent
                 weights[i][j] = 0;
             }
         }
+        System.out.println("MEOWWW Weights: ");
+        print2dArray(weights);
         
     }
 
     public void reset()
     {
         action = new boolean[Environment.numberOfButtons];// Empty action
+        System.out.println("RESET Weights: ");
+        randomRange ++;
     }
 
-    private void print2dArray(float[][] arr){
+    private void print2dArray(double[][] arr){
         int len = arr.length;
         for(int i = 0; i < len; i++){
             int width = arr[i].length;
@@ -64,7 +69,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
         }
     }
 
-    private void print1dArray(float[] arr){
+    private void print1dArray(double[] arr){
         int len = arr.length;
         String a = "";
         for(int i = 0; i < len; i ++){
@@ -79,67 +84,69 @@ public class HelloWorld extends BasicAIAgent implements Agent
         }
         switch(actionNum){
             case A_ACTION:
-                //System.out.print("JUMP");
                 action[Mario.KEY_JUMP] = true;
                 break;
             case LEFT_ACTION:
-                //System.out.print("LEFT");
                 action[Mario.KEY_LEFT] = true;
                 break;
             case RIGHT_ACTION:
-                //System.out.print("RIGHT");
                 action[Mario.KEY_RIGHT] = true;
                 break;
             case A_RIGHT_ACTION:
-                //System.out.print("JUMP RIGHT");
                 action[Mario.KEY_JUMP] = true;
                 action[Mario.KEY_RIGHT] = true;
                 break;
             case A_LEFT_ACTION:
-                //System.out.print("A LEFT");
                 action[Mario.KEY_LEFT] = true;
                 action[Mario.KEY_JUMP] = true;
                 break;
         }
     }
 
-    private float calcQ(float[][] features, float[][] weights, int action){
-        float curQ = 0;
-        System.out.print("ACTION FEATURES: ");
+    private double calcQ(double[][] features, double[][] weights, int action){
+        double curQ = 0;
         for(int i = 0; i < NUM_FEATURES; i++){
             curQ += features[action][i] * weights[action][i];
         }
         return curQ;
     }
 
-    public float reward(Environment observation){
+    public double reward(Environment observation){
         /*if(Mario.getStatus() == Mario.STATUS_DEAD){
 
         }*/
-        float marioModeScore = (observation.getMarioMode() - prevMarioMode) * MODE_WEIGHT;
-        float marioProgressScore = (observation.getMarioFloatPos()[0] - prevXPos - 1) * PROGRESS_WEIGHT;
-        if(marioProgressScore < 0)
-        {
-            marioProgressScore *= 20;
-        }
+        double marioModeScore = (observation.getMarioMode() - prevMarioMode) * MODE_WEIGHT;
+        double marioProgressScore = (observation.getMarioFloatPos()[0] - prevXPos - 1) * PROGRESS_WEIGHT;
         prevMarioMode = observation.getMarioMode();
         prevXPos = observation.getMarioFloatPos()[0];
-        float marioYProgress = (prevYPos - observation.getMarioFloatPos()[1] - 1) * Y_PROGRESS_WEIGHT;
+        double marioYProgress = (prevYPos - observation.getMarioFloatPos()[1] - 1) * Y_PROGRESS_WEIGHT;
         if(observation.isMarioOnGround())
         {
             prevYPos = observation.getMarioFloatPos()[1];
         }
-        float reward = marioProgressScore + marioYProgress;
-        System.out.println("REWARD: " + reward);
+        double reward = marioProgressScore + marioYProgress;
         return marioProgressScore + marioYProgress;
     }
+    private void printWeights(double[][] vec){
+        System.out.println("WEIGHTS");
+        for(int i = 0; i< vec.length; i++)
+        {
+            double sum = 0;
+            for(int j = 0; j < vec.length; j++)
+            {
+                sum += vec[i][j];
+            }
+            System.out.println("action = " + i + " weight = " + sum);
+        }
+    }
 
-    private void incremementWeights(float error, int action){
-        float[][] features = FeatureExtractor.extractFeatures(prevObv, action);
+    private void incremementWeights(double error, int action){
+        double[][] features = FeatureExtractor.extractFeatures(prevObv, action);
         for(int i = 0; i < NUM_FEATURES; i++){
             weights[action][i] -= features[action][i] * error * STEP_SIZE;
         }
     }
+
 
 
     public boolean[] getAction(Environment observation)
@@ -160,45 +167,38 @@ public class HelloWorld extends BasicAIAgent implements Agent
 
 
         //prevObv = observation;
-        float[][] features = FeatureExtractor.extractFeatures(prevObv, prevAction);
-        //System.out.println("FEATURESSSSS");
-        //print2dArray(features); 
-        float curQ = calcQ(features, weights, prevAction);
-        float maxActionVal = -10000000;
+        double[][] features = FeatureExtractor.extractFeatures(prevObv, prevAction);
+        double curQ = calcQ(features, weights, prevAction);
+        double maxActionVal = -10000000;
         int maxAction = 0;
-        float reward = 0;
+        double reward = 0;
         for(int i = 0; i < NUM_ACTIONS; i++)
         {
-            float[][] curFeatures = FeatureExtractor.extractFeatures(observation, i);
-            float qValue = calcQ(curFeatures, weights, i);
+            double[][] curFeatures = FeatureExtractor.extractFeatures(observation, i);
+            double qValue = calcQ(curFeatures, weights, i);
             if(qValue > maxActionVal) {
                 maxActionVal = qValue;
                 maxAction = i;
                 reward = maxActionVal;
             }
         }
-        System.out.println(reward);
-        float error = curQ - (reward(observation) + DISCOUNT * maxActionVal);
+        double error = curQ - (reward(observation) + DISCOUNT * maxActionVal);
         incremementWeights(error, prevAction);
         prevAction = maxAction;
         Random randGen = new Random();
-        int pickRand = randGen.nextInt(3);
+        int pickRand = randGen.nextInt(randomRange);
         int chosenAction = maxAction;
-        System.out.println("MAX ACTION: " + chosenAction);
         if(pickRand == 1)
         {
+            System.out.println("RAND ACTION: " + chosenAction);
             chosenAction = randGen.nextInt(NUM_ACTIONS);
-            System.out.println("RANDOM: " + chosenAction);
+            //System.out.println("RANDOM: " + chosenAction);
         } else{
-            
+            System.out.println("MAX ACTION: " + chosenAction);
         }
+        printWeights(weights);
         setAction(chosenAction);
-        System.out.println("WEIIIIGGGGHTS");
-        print2dArray(weights);
-        System.out.println("FEATURES");
-        print2dArray(features);
         prevObv = observation;
-        //System.out.println("ACITION:" + chosenAction);
 
         return action;
 
@@ -224,8 +224,8 @@ public class HelloWorld extends BasicAIAgent implements Agent
         print2dArray(completeObv);
         System.out.println("levelObv");
         print2dArray(levelObv);
-        float[] mposition = observation.getMarioFloatPos();
-        float[] eposition = observation.getEnemiesFloatPos();
+        double[] mposition = observation.getMarioFloatPos();
+        double[] eposition = observation.getEnemiesdoublePos();
         System.out.println("mario position");
         print1dArray(mposition);
         System.out.println("enemies position");
