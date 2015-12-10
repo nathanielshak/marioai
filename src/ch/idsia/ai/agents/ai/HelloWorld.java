@@ -12,12 +12,14 @@ import java.util.Arrays;
 
 public class HelloWorld extends BasicAIAgent implements Agent
 {
-    private static final int A_ACTION = 0;
-    private static final int LEFT_ACTION = 1;
-    private static final int RIGHT_ACTION = 2;
-    private static final int A_LEFT_ACTION = 3;
-    private static final int A_RIGHT_ACTION = 4;
-    private static final int NOTHING_ACTION = 5;
+    //private static final int A_ACTION = 0;
+    private static final int LEFT_ACTION = 0;
+    private static final int RIGHT_ACTION = 1;
+    //private static final int A_LEFT_ACTION = 3;
+    private static final int A_RIGHT_ACTION = 5; //this actually isn't stored in feature extractor, just called by other actions
+    private static final int LONG_JUMP_ACTION = 2;
+    private static final int MEDIUM_JUMP_ACTION = 3;
+    private static final int SMALL_JUMP_ACTION = 4;
     private static final int NUM_FRAMES = 5;
 
     //private static final int NUM_ACTIONS = 5;
@@ -44,10 +46,17 @@ public class HelloWorld extends BasicAIAgent implements Agent
     private int jumpCounter = 0;
     private boolean highJumping = false;
 
-
+    private boolean training = true;
 
     private double[][] weights = new double[FeatureExtractor.NUM_ACTIONS][FeatureExtractor.NUM_FEATURES];
-    private double[][] testWeights = new double[][]{{1.8329764202878947E166, 2.531909143061707E165, 0.0, 0.0, 1.3604313729517781E161, 8.1414913304970635E158, 5.389838708571774E165, 0.0, 5.382516525280311E165, 0.0, 0.0, 1.246903658919973E145, 3.3695452871385454E162, 0.0, 2.4763205588331463E152, 1.5965451797921462E158, 6.1669248998428184E119, 3.1392616478851195E161}, {7.122413505377971E165, 2.9628638473520477E165, 0.0, 0.0, 1.0040943441629732E162, 8.141491330010997E158, 1.77073762616538E165, 0.0, 1.77311065941922E165, 0.0, 0.0, 1.466872291750193E145, 9.63384780565051E162, 0.0, 9.167511309658217E150, 2.6572405787575913E158, 2.2704994472729185E143, 2.3008304496404965E161}, {8.883203256943097E165, 3.287740720422594E165, 0.0, 0.0, 4.0080194922630023E121, 2.6313813989363045E135, 4.201921740683757E165, 0.0, 4.131331605853192E165, 0.0, 0.0, 2.620928728219933E145, 6.102987195130822E163, 0.0, 7.548308817654806E153, 2.4550773165243904E152, 3.0624926524627365E119, 1.77854035313215E159}, {8.410063988622071E165, 1.2518755197970267E165, 0.0, 0.0, 9.014244813560062E161, 1.1519530774787252E101, 3.354172848370213E165, 0.0, 3.294597664089294E165, 0.0, 0.0, 9.548011625824373E144, 6.052220378988367E163, 0.0, 5.973713360621957E152, 1.0611773896591331E158, 4.3663450909094585E142, 3.1638499807487665E154}, {7.063519870529907E165, 2.029234059973518E163, 0.0, 0.0, 7.902470431147037E161, 4.86067030785742E148, 1.7021444073036827E165, 0.0, 1.6963318329295808E165, 0.0, 0.0, 1.3748401384259513E145, 4.031346530465122E162, 0.0, 7.919709546442658E153, 3.595056277636721E153, 2.6198070545456748E143, 8.428311698241037E160}};
+    private double[][] testWeights = new double[][]{{7443203.452177169, 6375929.130141851, 0.0, 0.0, 55450.536791966755, 350421.2752935597, 4138338.0949846506, 0.0, 3823537.6623416487, 0.0, 0.0, 66046.5449445536, 1210133.4547858397, 0.0, 93707.73610877377, 209964.89257364662, 23992.430919815994, 30986.114255481523}, {7396927.428823305, 6420896.110576321, 0.0, 0.0, 55495.974009936486, 355627.0253948655, 4103985.0020787073, 0.0, 3860033.559927329, 0.0, 0.0, 123884.06453609436, 1194613.3887976396, 0.0, 84284.55434941401, 210697.42383732996, 20052.243294802487, 30820.50000533416}, {7929774.0500113545, 1256231.5534669664, 0.0, 0.0, 503673.2080292855, 472354.0228287712, 4992321.770590185, 0.0, 5306607.830251044, 0.0, 0.0, 0.0, 0.0, 0.0, 30950.257935016627, 206591.85875709567, 774.8754187763052, 33432.18523532562}, {7925168.155928818, 1840421.707538376, 0.0, 0.0, 382313.2877606263, 486040.01337463234, 4972289.347719243, 0.0, 5339261.130313682, 0.0, 0.0, 0.0, 0.0, 0.0, 26397.216176235415, 205938.4019361382, 8633.524356083437, 28373.70353886045}, {7924742.907738333, 3544010.337182883, 0.0, 0.0, 303058.48013390036, 497204.5642173105, 4970492.147797707, 0.0, 5339677.118154684, 0.0, 0.0, 0.0, 0.0, 0.0, 26640.80530015986, 212118.32632085402, 2196.2472653896707, 25696.62169124722}};
+
+
+
+
+
+
+
 
 
 
@@ -105,10 +114,11 @@ public class HelloWorld extends BasicAIAgent implements Agent
         for(int i = 0; i < Environment.numberOfButtons; i++){
             action[i] = false;
         }
+        System.out.println(actionNum);
         switch(actionNum){
-            case A_ACTION:
+            /*case A_ACTION:
                 action[Mario.KEY_JUMP] = true;
-                break;
+                break;*/
             case LEFT_ACTION:
                 action[Mario.KEY_LEFT] = true;
                 break;
@@ -119,8 +129,23 @@ public class HelloWorld extends BasicAIAgent implements Agent
                 action[Mario.KEY_JUMP] = true;
                 action[Mario.KEY_RIGHT] = true;
                 break;
-            case A_LEFT_ACTION:
+            /*case A_LEFT_ACTION:
                 action[Mario.KEY_LEFT] = true;
+                action[Mario.KEY_JUMP] = true;
+                break;*/
+            case LONG_JUMP_ACTION:
+                jumpHigh(8);
+                action[Mario.KEY_RIGHT] = true;
+                action[Mario.KEY_JUMP] = true;
+                break;
+            case MEDIUM_JUMP_ACTION:
+                jumpHigh(4);
+                action[Mario.KEY_RIGHT] = true;
+                action[Mario.KEY_JUMP] = true;
+                break;
+            case SMALL_JUMP_ACTION:
+                jumpHigh(2);
+                action[Mario.KEY_RIGHT] = true;
                 action[Mario.KEY_JUMP] = true;
                 break;
         }
@@ -149,7 +174,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
         }
         double marioProgressScore = (observation.getMarioFloatPos()[0] - prevXPos - 1) * PROGRESS_WEIGHT;
         prevMarioMode = observation.getMarioMode();
-        prevXPos = observation.getMarioFloatPos()[0];
+        
         double marioYProgress = (prevYPos - observation.getMarioFloatPos()[1]) * Y_PROGRESS_WEIGHT;
 
         if(observation.isMarioOnGround() && marioYProgress > 0)
@@ -197,66 +222,14 @@ public class HelloWorld extends BasicAIAgent implements Agent
     }
 
     private boolean uselessAction(int action, Environment observation){
-        if((action == A_LEFT_ACTION || action == A_RIGHT_ACTION || action == A_ACTION) && !observation.mayMarioJump()){
+        if((action == LONG_JUMP_ACTION || action == SMALL_JUMP_ACTION || action == MEDIUM_JUMP_ACTION) && !observation.mayMarioJump()){
             return true;
         }
         return false;   
     }
+    
     /*
     public boolean[] getAction(Environment observation){
-        if(prevObv == null)
-        { 
-            prevObv = observation;
-            prevAction = A_RIGHT_ACTION;
-            setAction(A_RIGHT_ACTION);
-            return action;
-        }
-
-    public void signalStatus(int status){
-        System.out.println("AHHH WE DEAD :(");
-    }
-
-
-        //prevObv = observation;
-        double[][] features = FeatureExtractor.extractFeatures(prevObv, prevAction);
-        double curQ = calcQ(features, testWeights, prevAction);
-        double maxActionVal = -10000000;
-        int maxAction = 0;
-        double reward = 0;
-        for(int i = 0; i < FeatureExtractor.NUM_ACTIONS; i++)
-        {
-            if(uselessAction(i, observation)){
-                continue;
-            }
-            double[][] curFeatures = FeatureExtractor.extractFeatures(observation, i);
-            double qValue = calcQ(curFeatures, testWeights, i);
-            //System.out.println("Q = " + qValue);
-            if(qValue >= maxActionVal) {
-                maxActionVal = qValue;
-                maxAction = i;
-                reward = maxActionVal;
-            }
-        }
-        prevAction = maxAction;
-        int chosenAction = maxAction;
-        setAction(chosenAction);
-        prevObv = observation;
-
-        return action;
-    }*/
-
-
-    private void jumpHigh(int frames){
-        highJumping = true;
-        jumpCounter = frames;
-    }
-    
-
-    public boolean[] getAction(Environment observation)
-    {
-        /*if(GlobalOptions.getMarioComponent().getStatus() == Mario.STATUS_DEAD){
-            System.out.println("HEEEEES DEEAAAAD!");
-        }*/
         double curQ = 0;
         double maxActionVal = 0;
         int maxAction = 0;
@@ -269,7 +242,6 @@ public class HelloWorld extends BasicAIAgent implements Agent
                 setAction(A_RIGHT_ACTION);
                 return action;
             }
-
 
             //prevObv = observation;
             double[][] features = FeatureExtractor.extractFeatures(prevObv, prevAction);
@@ -295,7 +267,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
                 }
             }
             double error = curQ - (reward(observation) + DISCOUNT * maxActionVal);
-            incremementWeights(error, prevAction);
+            //incremementWeights(error, prevAction);
             
             int pickRand = randGen.nextInt(randomRange);
             int chosenAction = maxAction;
@@ -303,16 +275,19 @@ public class HelloWorld extends BasicAIAgent implements Agent
             if(pickRand == 1 || pickRand == 2)
             {
                 //System.out.println("RAND ACTION: " + chosenAction);
-                chosenAction = randGen.nextInt(FeatureExtractor.NUM_ACTIONS);
+                //chosenAction = randGen.nextInt(FeatureExtractor.NUM_ACTIONS);
                 //System.out.println("RANDOM: " + chosenAction);
             } else{
                 //System.out.println("MAX ACTION: " + chosenAction);
             }
 
             //System.out.println("REWARD: " + reward);
-            if(FeatureExtractor.extractFeatures(observation, 0)[0][FeatureExtractor.MARIO_IN_FRONT_LEDGE] == 1 /*|| features[prevAction][FeatureExtractor.MARIO_CLOSE_TO_LEDGE] == 1)*/ && observation.mayMarioJump()){
-                jumpHigh(10);
-                //System.out.println("MEEP");
+            if(FeatureExtractor.extractFeatures(observation, 0)[0][FeatureExtractor.MARIO_IN_FRONT_LEDGE] == 1  && observation.mayMarioJump()){
+                jumpHigh(8);
+                setAction(A_RIGHT_ACTION);
+                
+                System.out.println("MEEP");
+                return action;
             }
             prevObv = observation;
             printWeights(weights);
@@ -321,20 +296,10 @@ public class HelloWorld extends BasicAIAgent implements Agent
             frames --;
             prevAction = chosenAction;
 
-        }
-        double error = curQ - (reward(observation) + DISCOUNT * maxActionVal);
-        incremementWeights(error, prevAction);
         
-        int pickRand = randGen.nextInt(randomRange);
-        int chosenAction = maxAction;
-        //if(maxAction!= 2 && maxAction !=1) System.out.println("MAX ACTION: " + maxAction);
-        if(pickRand == 1 || pickRand == 2)
-        {
-            //System.out.println("RAND ACTION: " + chosenAction);
-            chosenAction = randGen.nextInt(FeatureExtractor.NUM_ACTIONS);
-            //System.out.println("RANDOM: " + chosenAction);
 
-        } else{
+        }
+        else{
             jumpCounter --;
             if(jumpCounter <= 0){
                 highJumping = false;
@@ -346,7 +311,126 @@ public class HelloWorld extends BasicAIAgent implements Agent
 
         return action;
     }
+    */
 
+    private void jumpHigh(int frames){
+        //System.out.println("GOING UUUUUP");
+        highJumping = true;
+        jumpCounter = frames;
+    }
+    
+    
+    public boolean[] getAction(Environment observation)
+    {
+        if(highJumping){
+            jumpCounter --;
+            //System.out.println("JUMPING : " + jumpCounter);
+            if(jumpCounter <= 0){
+                //highJumping = false;
+                if(!observation.isMarioOnGround()){
+                    setAction(RIGHT_ACTION);
+                    prevXPos = observation.getMarioFloatPos()[0];
+                    return action; 
+                } else {
+                    highJumping = false;
+                    //System.out.println("LANDING MADE CAPTAIN");
+                }
+                
+            } else{
+                setAction(A_RIGHT_ACTION);
+                prevXPos = observation.getMarioFloatPos()[0];
+
+                return action;
+            }
+            
+        }
+        //System.out.println("WE NOT JUMPING");
+        if(prevObv == null)
+        { //first action
+           
+            prevObv = observation;
+            prevAction = RIGHT_ACTION;
+            setAction(RIGHT_ACTION);
+            return action;
+        }
+
+        //prevObv = observation;
+        double[][] features = FeatureExtractor.extractFeatures(prevObv, prevAction);
+        /*MERP MERP*/
+
+        double curQ = 0; 
+        if(training)
+        {
+            curQ = calcQ(features, weights, prevAction);
+        }else{
+            curQ = calcQ(features, testWeights, prevAction);
+        }
+        double maxActionVal = -10000000;
+        int maxAction = 0;
+        double reward = 0;
+        for(int i = 0; i < FeatureExtractor.NUM_ACTIONS; i++)
+        {
+            if(uselessAction(i, observation)){
+                continue;
+            }
+            double[][] curFeatures = FeatureExtractor.extractFeatures(observation, i);
+            /*MERP MERP*/
+            double qValue = 0;
+            if(training){
+                qValue = calcQ(curFeatures, weights, i);
+            } else{
+                qValue = calcQ(curFeatures, testWeights, i);
+            }
+            //System.out.println("Q = " + qValue);
+            if(qValue >= maxActionVal) {
+                maxActionVal = qValue;
+                maxAction = i;
+                reward = maxActionVal;
+            }
+        }
+        double error = curQ - (reward(observation) + DISCOUNT * maxActionVal);
+        /*MERP MERP*/
+        if(training){
+            incremementWeights(error, prevAction);
+        }
+        
+        int pickRand = randGen.nextInt(randomRange);
+        int chosenAction = maxAction;
+        //System.out.println("MAX ACTION: " + maxAction);
+        if(pickRand == 1 || pickRand == 2)
+        {
+            //System.out.println("RAND ACTION: " + chosenAction);
+            /*MERRRRRRP*/
+            if(training){
+                chosenAction = randGen.nextInt(FeatureExtractor.NUM_ACTIONS);
+            }
+            //System.out.println("RANDOM: " + chosenAction);
+        } else{
+            //System.out.println("MAX ACTION: " + chosenAction);
+        }
+
+        //System.out.println("REWARD: " + reward);
+        /*if(FeatureExtractor.extractFeatures(observation, 0)[0][FeatureExtractor.MARIO_IN_FRONT_LEDGE] == 1  && observation.mayMarioJump()){
+            jumpHigh(8);
+            setAction(A_RIGHT_ACTION);
+            return action;
+            //System.out.println("MEEP");
+        }*/
+        prevXPos = observation.getMarioFloatPos()[0];
+        prevObv = observation;
+        printWeights(weights);
+        setAction(chosenAction);
+        
+        frames --;
+        prevAction = chosenAction;
+
+    
+
+            
+
+        return action;
+    }
+    
 }
 
 

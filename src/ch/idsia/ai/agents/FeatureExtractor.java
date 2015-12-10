@@ -17,7 +17,7 @@ public class FeatureExtractor {
 	private static final int MEDIUM_LEDGE_RANGE = 2;
 	private static final int CLOSE_TO_LEDGE_BEGIN = 2;
 	private static final int CLOSE_TO_LEDGE_END = 4;
-	private static final int CLOSE_ENEMY_RANGE = 3;
+	private static final int CLOSE_ENEMY_RANGE = 2;
 
 	//Features
 	public static final int NUM_ACTIONS = 5;

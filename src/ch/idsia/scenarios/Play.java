@@ -36,8 +36,8 @@ public class Play {
         EvaluationOptions options = new CmdLineOptions(new String[0]);
         options.setAgent(controller);
         Task task = new ProgressTask(options);
-        options.setMaxFPS(maxSpeed);
-        options.setVisualization(false);
+        options.setMaxFPS(false);
+        options.setVisualization(true);
         options.setNumberOfTrials(numTrials);
         options.setMatlabFileName("");
         options.setLevelDifficulty(0);
