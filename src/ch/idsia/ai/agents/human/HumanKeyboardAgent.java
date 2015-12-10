@@ -8,6 +8,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
 
 /**
  * Created by IntelliJ IDEA.
@@ -37,6 +38,18 @@ public class HumanKeyboardAgent extends KeyAdapter implements Agent
     public boolean[] getAction(Environment observation)
     {
         float[] enemiesPos = observation.getEnemiesFloatPos();
+        boolean print = false;
+        for(int i=0; i< Action.length; i++){
+            if(Action[i]!=false){
+                print = true;
+                break;
+            }
+        }
+        if(print){
+            System.out.print("ACTION: ");
+            System.out.println(Arrays.toString(Action));
+        }
+        
         return Action;
     }
 
