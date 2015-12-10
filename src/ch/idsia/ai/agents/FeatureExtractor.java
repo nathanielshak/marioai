@@ -47,6 +47,7 @@ public class FeatureExtractor {
 
 	//Stuff *Come back and name this*
 	private static float prevMarioPos = 0;
+	private static boolean detectY = false;
 
 	private static void print2dLevel(byte[][] arr){
         int len = arr.length;
@@ -236,7 +237,8 @@ public class FeatureExtractor {
 
 		//Ledge Features
 		boolean facingLedge = FacingLedge(levelScene);
-		features[action][MARIO_FACING_LEDGE] =  facingLedge ? 1 : 0;
+		/*DONT CARE*/
+		features[action][MARIO_FACING_LEDGE] = 0;
 		features[action][SMALL_LEDGE] = LedgeRange(levelScene) == SMALL_LEDGE_RANGE ? 1: 0;
 		features[action][MEDIUM_LEDGE] = LedgeRange(levelScene) == MEDIUM_LEDGE_RANGE ? 1: 0;
 		features[action][LARGE_LEDGE] = LedgeRange(levelScene) > MEDIUM_LEDGE_RANGE ? 1: 0;
@@ -246,8 +248,10 @@ public class FeatureExtractor {
 		//Ledge distance
 		
 		features[action][MARIO_IN_FRONT_LEDGE] = DistanceToLedge(levelScene, facingLedge) == 1 ? 1:0;
-		features[action][MARIO_CLOSE_TO_LEDGE] = DistanceToLedge(levelScene, facingLedge) == 2 ? 1:0;
-		features[action][MARIO_NOT_CLOSE_TO_LEDGE] = DistanceToLedge(levelScene, facingLedge) == 3 ? 1:0;
+		/*DONT CARE*/
+		features[action][MARIO_CLOSE_TO_LEDGE] = 0;
+		/*DONT CARE*/
+		features[action][MARIO_NOT_CLOSE_TO_LEDGE] = 0;
 
 		//Jumped facing ledge
 		features[action][IN_FRONT_OF_LEDGE_JUMPED] = inFrontOfLedgeJumped(observation, facingLedge, levelScene) ? 1:0;
