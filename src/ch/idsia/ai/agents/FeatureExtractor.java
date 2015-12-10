@@ -19,23 +19,23 @@ public class FeatureExtractor {
 	private static final int CLOSE_TO_LEDGE_END = 4;
 
 	//Features
-	private static final int NUM_ACTIONS = 5;
-	private static final int NUM_FEATURES =13;
+	public static final int NUM_ACTIONS = 5;
+	public static final int NUM_FEATURES =13;
 
 	//Features Indices
-	private static final int ON_GROUND = 0;
-	private static final int CAN_JUMP = 1;
-	private static final int DANGER_OF_GAP = 2;
-	private static final int MARIO_FACING_LEDGE = 3;
-	private static final int SMALL_LEDGE = 4;
-	private static final int MEDIUM_LEDGE = 5;
-	private static final int LARGE_LEDGE = 6;
-	private static final int MARIO_IS_STUCK = 7;
-	private static final int MARIO_IN_FRONT_LEDGE = 8;
-	private static final int MARIO_CLOSE_TO_LEDGE = 9;
-	private static final int MARIO_NOT_CLOSE_TO_LEDGE = 10;
-	private static final int IN_FRONT_OF_LEDGE_JUMPED = 11;
-	private static final int AIR_FACING_LEDGE = 12;
+	public static final int ON_GROUND = 0;
+	public static final int CAN_JUMP = 1;
+	public static final int DANGER_OF_GAP = 2;
+	public static final int MARIO_FACING_LEDGE = 3;
+	public static final int SMALL_LEDGE = 4;
+	public static final int MEDIUM_LEDGE = 5;
+	public static final int LARGE_LEDGE = 6;
+	public static final int MARIO_IS_STUCK = 7;
+	public static final int MARIO_IN_FRONT_LEDGE = 8;
+	public static final int MARIO_CLOSE_TO_LEDGE = 9;
+	public static final int MARIO_NOT_CLOSE_TO_LEDGE = 10;
+	public static final int IN_FRONT_OF_LEDGE_JUMPED = 11;
+	public static final int AIR_FACING_LEDGE = 12;
 
 
 	//Stuff *Come back and name this*
@@ -72,11 +72,13 @@ public class FeatureExtractor {
             boolean f = true;
             for(int y = 12; y < 22; ++y)
             {
-                if  (levelScene[y][x] != 0)
+                if  (levelScene[y][x] != 0){
                     f = false;
+                }
             }
-            if (f && levelScene[12][11] != 0)
+            if (f && levelScene[12][11] != 0){
                 return true;
+            }
         }
         return false;
     }
@@ -169,7 +171,7 @@ public class FeatureExtractor {
 	    	}
 		}
     	if (ledgeInFront < ledgeBelow){
-    		System.out.println("AHAHAHAHKDFJDSJGFDSKNGERKLSGSDKLFHNSDLGKNSDKNGV");
+    		//System.out.println("AHAHAHAHKDFJDSJGFDSKNGERKLSGSDKLFHNSDLGKNSDKNGV");
     	}
     	return (ledgeInFront < ledgeBelow);
     }

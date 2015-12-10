@@ -16,8 +16,8 @@ public class HelloWorld extends BasicAIAgent implements Agent
     private static final int A_RIGHT_ACTION = 4;
     private static final int NOTHING_ACTION = 5;
 
-    private static final int NUM_ACTIONS = 5;
-    private static final int NUM_FEATURES = 12;
+    //private static final int NUM_ACTIONS = 5;
+    //private static final int NUM_FEATURES = 12;
     private static final double DISCOUNT = 1;
     private static final double STEP_SIZE = 0.2;
 
@@ -37,14 +37,14 @@ public class HelloWorld extends BasicAIAgent implements Agent
 
 
 
-    private double[][] weights = new double[NUM_ACTIONS][NUM_FEATURES];
+    private double[][] weights = new double[FeatureExtractor.NUM_ACTIONS][FeatureExtractor.NUM_FEATURES];
 
     public HelloWorld(String s)
     {
 
         super("HelloWorld");
-        for(int i = 0; i < NUM_ACTIONS; i++){
-            for(int j = 0; j < NUM_FEATURES; j++){
+        for(int i = 0; i < FeatureExtractor.NUM_ACTIONS; i++){
+            for(int j = 0; j < FeatureExtractor.NUM_FEATURES; j++){
                 weights[i][j] = 0;
             }
         }
@@ -109,7 +109,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
 
     private double calcQ(double[][] features, double[][] weights, int action){
         double curQ = 0;
-        for(int i = 0; i < NUM_FEATURES; i++){
+        for(int i = 0; i < FeatureExtractor.NUM_FEATURES; i++){
             curQ += features[action][i] * weights[action][i];
         }
         return curQ;
@@ -148,7 +148,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
 
     private void incremementWeights(double error, int action){
         double[][] features = FeatureExtractor.extractFeatures(prevObv, action);
-        for(int i = 0; i < NUM_FEATURES; i++){
+        for(int i = 0; i < FeatureExtractor.NUM_FEATURES; i++){
             weights[action][i] -= features[action][i] * error * STEP_SIZE;
         }
     }
@@ -184,7 +184,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
         double maxActionVal = -10000000;
         int maxAction = 0;
         double reward = 0;
-        for(int i = 0; i < NUM_ACTIONS; i++)
+        for(int i = 0; i < FeatureExtractor.NUM_ACTIONS; i++)
         {
             //System.out.println("Mario can jump? " + observation.mayMarioJump());
             //System.out.println("checking action: " + i);
@@ -209,7 +209,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
         if(pickRand == 1)
         {
             //System.out.println("RAND ACTION: " + chosenAction);
-            chosenAction = randGen.nextInt(NUM_ACTIONS);
+            chosenAction = randGen.nextInt(FeatureExtractor.NUM_ACTIONS);
             //System.out.println("RANDOM: " + chosenAction);
         } else{
             //System.out.println("MAX ACTION: " + chosenAction);
