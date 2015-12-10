@@ -214,7 +214,8 @@ public class FeatureExtractor {
 
 		//In air facing ledge
 		features[action][AIR_FACING_LEDGE] = (facingLedge && !observation.isMarioOnGround() && observation.mayMarioJump()) ? 1:0;
-
+		
+		
 		//System.out.print("Printing Level\n");
 		//print2dArray(features);
 		//System.out.print("\n\n\n\n");

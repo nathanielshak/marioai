@@ -18,6 +18,12 @@ public class ProgressTask implements Task {
 
     private EvaluationOptions options;
 
+    private EvaluationInfo evaluationInfo = null;
+
+    public EvaluationInfo evalInfo(){
+        return evaluationInfo;
+    }
+
     public ProgressTask(EvaluationOptions evaluationOptions) {
         setOptions(evaluationOptions);
     }
@@ -31,7 +37,9 @@ public class ProgressTask implements Task {
         for (EvaluationInfo result : results) {
             //if (result.marioStatus == Mario.STATUS_WIN )
             //    Easy.save(options.getAgent(), options.getAgent().getName() + ".xml");
+            //System.out.println("")
             distanceTravelled += result.computeDistancePassed();
+            evaluationInfo = result;
         }
         distanceTravelled = distanceTravelled / results.size();
         return new double[]{distanceTravelled};

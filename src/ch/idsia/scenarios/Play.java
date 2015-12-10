@@ -7,6 +7,7 @@ import ch.idsia.ai.tasks.ProgressTask;
 import ch.idsia.ai.tasks.Task;
 import ch.idsia.tools.CmdLineOptions;
 import ch.idsia.tools.EvaluationOptions;
+import ch.idsia.mario.engine.sprites.Mario;
 
 /**
  * Created by IntelliJ IDEA.
@@ -43,7 +44,12 @@ public class Play {
         task.setOptions(options);
         for(int i = 0; i < numTrials; i++){
             options.setLevelRandSeed((int) (Math.random () * Integer.MAX_VALUE));
+
             System.out.println ("Score: " + task.evaluate (controller)[0]);
+            System.out.println(task.evalInfo().marioStatus);
+            
+            controller.signalStatus(task.evalInfo().marioStatus);
         }
+        
     }
 }

@@ -6,6 +6,8 @@ import ch.idsia.mario.environments.Environment;
 import ch.idsia.ai.agents.FeatureExtractor;
 import ch.idsia.tools.EvaluationInfo;
 import java.util.Random;
+import ch.idsia.mario.engine.GlobalOptions;
+import ch.idsia.mario.engine.MarioComponent;
 
 public class HelloWorld extends BasicAIAgent implements Agent
 {
@@ -32,6 +34,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
     private double prevYPos = 0;
     private int randomRange = 5;
     private int trial = 0;
+    private boolean firstTrial = true;
 
     private Random randGen = new Random();
 
@@ -58,6 +61,10 @@ public class HelloWorld extends BasicAIAgent implements Agent
         action = new boolean[Environment.numberOfButtons];// Empty action
         System.out.println("RESET Weights: ");
         print2dArray(weights);
+        prevYPos = 0;
+        prevXPos = 0;
+        prevMarioMode = 2;
+        firstTrial = false;
         //randomRange ++;
     }
 
@@ -133,6 +140,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
         double reward = marioProgressScore + marioYProgress;
         return marioProgressScore + marioYProgress;
     }
+
     private void printWeights(double[][] vec){
         //System.out.println("WEIGHTS");
         for(int i = 0; i< vec.length; i++)
@@ -160,9 +168,16 @@ public class HelloWorld extends BasicAIAgent implements Agent
         return false;   
     }
 
+    public void signalStatus(int status){
+        System.out.println("AHHH WE DEAD :(");
+    }
+
 
     public boolean[] getAction(Environment observation)
     {
+        /*if(GlobalOptions.getMarioComponent().getStatus() == Mario.STATUS_DEAD){
+            System.out.println("HEEEEES DEEAAAAD!");
+        }*/
         if(prevObv == null)
         { //first action
             /*prevObv = observation;
