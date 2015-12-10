@@ -23,6 +23,7 @@ public class HumanKeyboardAgent extends KeyAdapter implements Agent
     List<boolean[]> history = new ArrayList<boolean[]>();
     private boolean[] Action = null;
     private String Name = "HumanKeyboardAgent";
+    private double prevYPos = 0;
 
     //private static final int NUM_ACTIONS = 5;
     //private static final int NUM_FEATURES = 12;
@@ -73,15 +74,22 @@ public class HumanKeyboardAgent extends KeyAdapter implements Agent
                 break;
             }
         }
+        /*
         if(print){
             System.out.print("ACTION: ");
             System.out.println(Arrays.toString(Action));
         }
+    */
 
         curFeatures = FeatureExtractor.extractFeatures(observation, 0);
+        /*
         System.out.println("Features:");
         printFeatures();
+
         //System.out.println("REWARD: " + reward(observation));
+
+        */
+       
         return Action;
     }
 
@@ -107,6 +115,7 @@ public class HumanKeyboardAgent extends KeyAdapter implements Agent
 */
 
     private void printFeatures(){
+        /*
         System.out.println("ON_GROUND: " + curFeatures[0][FeatureExtractor.ON_GROUND]);
         System.out.println("CAN_JUMP: " + curFeatures[0][FeatureExtractor.CAN_JUMP]);
         System.out.println("DANGER_OF_GAP: " + curFeatures[0][FeatureExtractor.DANGER_OF_GAP]);
@@ -125,6 +134,8 @@ public class HumanKeyboardAgent extends KeyAdapter implements Agent
         System.out.println("ENEMY_BEHIND: " + curFeatures[0][FeatureExtractor.ENEMY_BEHIND]);
         System.out.println("ENEMY_BELOW: " + curFeatures[0][FeatureExtractor.ENEMY_BELOW]);
         System.out.println("ENEMY_FRONT: " + curFeatures[0][FeatureExtractor.ENEMY_FRONT]);
+        */
+        
     }
 
     public AGENT_TYPE getType() {        return AGENT_TYPE.HUMAN;    }
