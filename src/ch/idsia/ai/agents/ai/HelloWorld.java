@@ -26,8 +26,8 @@ public class HelloWorld extends BasicAIAgent implements Agent
     private static final double STEP_SIZE = 0.1;
 
     private static final double MODE_WEIGHT = 5;
-    private static final double PROGRESS_WEIGHT = 5;
-    private static final double Y_PROGRESS_WEIGHT = 100;
+    private static final double PROGRESS_WEIGHT = 0.2;
+    private static final double Y_PROGRESS_WEIGHT = 0;
     private static final double MARIO_STUCK_WEIGHT = 0;
 
     private Environment prevObv;
@@ -47,8 +47,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
 
 
     private double[][] weights = new double[FeatureExtractor.NUM_ACTIONS][FeatureExtractor.NUM_FEATURES];
-    private double[][] testWeights = new double[][]{{143753.28099996227, 27439.72285336339, -0.2329998016357422, 0.0, -1618.8985721684187, -1702.8778035597015, -26361.806154145084, 0.0, -70609.51263672263, 0.0, 0.0, 10589.556032207158, -10585.711682434894, 0.0, 6209.896178482133, 4953.649658156672, 4338.739232116856, 1704.2986533274366}, {143820.02625610307, 122106.47921696362, 7.368601365137147, 0.0, -1618.033040167786, -1579.2646764400642, -26388.955724932246, 0.0, -70637.10543114341, 0.0, 0.0, 10587.21451926444, -10574.218867572272, 0.0, 6237.0860434544475, 4963.953395992842, 4342.431044980206, 1646.2167004653986}, {143911.35247530063, 122185.75504026703, 1.8343210220336914, 0.0, -1626.1250803380815, -1589.0278030901998, -26392.713306254318, 0.0, -70692.9453611347, 0.0, 0.0, 10614.051273539617, -10500.635622979133, 0.0, 6208.879251441145, 4941.549039948, 4360.835558221862, 1662.9815150360582}, {143717.77965206478, 47314.17032533635, 0.30691290616814515, 0.0, -1626.8232826212611, -1589.8857810741647, -26372.80286192055, 0.0, -70600.64503037151, 0.0, 0.0, 10583.87367337172, -10544.436742801723, 0.0, 6180.084153058643, 4914.488849077498, 4322.486760295451, 1648.8139860627477}, {143662.93315557425, 33824.64796400747, 17.542394410588894, 0.0, -1629.3820055767244, -1593.873830623819, -26388.957282339157, 0.0, -70602.75312889557, 0.0, 0.0, 10591.247727989678, -10602.697629397051, 0.0, 6218.458783048232, 4899.29968177897, 4318.133796235348, 1673.6996067709847}};
-
+    private double[][] testWeights = new double[][]{{1.8329764202878947E166, 2.531909143061707E165, 0.0, 0.0, 1.3604313729517781E161, 8.1414913304970635E158, 5.389838708571774E165, 0.0, 5.382516525280311E165, 0.0, 0.0, 1.246903658919973E145, 3.3695452871385454E162, 0.0, 2.4763205588331463E152, 1.5965451797921462E158, 6.1669248998428184E119, 3.1392616478851195E161}, {7.122413505377971E165, 2.9628638473520477E165, 0.0, 0.0, 1.0040943441629732E162, 8.141491330010997E158, 1.77073762616538E165, 0.0, 1.77311065941922E165, 0.0, 0.0, 1.466872291750193E145, 9.63384780565051E162, 0.0, 9.167511309658217E150, 2.6572405787575913E158, 2.2704994472729185E143, 2.3008304496404965E161}, {8.883203256943097E165, 3.287740720422594E165, 0.0, 0.0, 4.0080194922630023E121, 2.6313813989363045E135, 4.201921740683757E165, 0.0, 4.131331605853192E165, 0.0, 0.0, 2.620928728219933E145, 6.102987195130822E163, 0.0, 7.548308817654806E153, 2.4550773165243904E152, 3.0624926524627365E119, 1.77854035313215E159}, {8.410063988622071E165, 1.2518755197970267E165, 0.0, 0.0, 9.014244813560062E161, 1.1519530774787252E101, 3.354172848370213E165, 0.0, 3.294597664089294E165, 0.0, 0.0, 9.548011625824373E144, 6.052220378988367E163, 0.0, 5.973713360621957E152, 1.0611773896591331E158, 4.3663450909094585E142, 3.1638499807487665E154}, {7.063519870529907E165, 2.029234059973518E163, 0.0, 0.0, 7.902470431147037E161, 4.86067030785742E148, 1.7021444073036827E165, 0.0, 1.6963318329295808E165, 0.0, 0.0, 1.3748401384259513E145, 4.031346530465122E162, 0.0, 7.919709546442658E153, 3.595056277636721E153, 2.6198070545456748E143, 8.428311698241037E160}};
 
 
 
@@ -134,7 +133,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
         }
         return curQ;
     }
-    private getCloseToGround(Environment observation)
+    private void getCloseToGround(Environment observation)
     {
         
     }
@@ -144,6 +143,10 @@ public class HelloWorld extends BasicAIAgent implements Agent
 
         }*/
         double marioModeScore = (observation.getMarioMode() - prevMarioMode) * MODE_WEIGHT;
+        if(observation.getMarioMode() != prevMarioMode)
+        {
+            System.out.println("MODE CHANGE WOW: ");
+        }
         double marioProgressScore = (observation.getMarioFloatPos()[0] - prevXPos - 1) * PROGRESS_WEIGHT;
         prevMarioMode = observation.getMarioMode();
         prevXPos = observation.getMarioFloatPos()[0];
@@ -152,7 +155,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
         if(observation.isMarioOnGround() && marioYProgress > 0)
         {
             prevYPos = observation.getMarioFloatPos()[1];
-            System.out.println("LALALAYAY:" + prevAction);
+            //System.out.println("LALALAYAY:" + prevAction);
         } else if(observation.isMarioOnGround() && marioYProgress <= 0){
             marioYProgress = 0;
             prevYPos = observation.getMarioFloatPos()[1];
@@ -254,6 +257,9 @@ public class HelloWorld extends BasicAIAgent implements Agent
         /*if(GlobalOptions.getMarioComponent().getStatus() == Mario.STATUS_DEAD){
             System.out.println("HEEEEES DEEAAAAD!");
         }*/
+        double curQ = 0;
+        double maxActionVal = 0;
+        int maxAction = 0;
         if(!highJumping){
             if(prevObv == null)
             { //first action
@@ -267,9 +273,9 @@ public class HelloWorld extends BasicAIAgent implements Agent
 
             //prevObv = observation;
             double[][] features = FeatureExtractor.extractFeatures(prevObv, prevAction);
-            double curQ = calcQ(features, weights, prevAction);
-            double maxActionVal = -10000000;
-            int maxAction = 0;
+            curQ = calcQ(features, weights, prevAction);
+            maxActionVal = -10000000;
+            maxAction = 0;
             double reward = 0;
             for(int i = 0; i < FeatureExtractor.NUM_ACTIONS; i++)
             {
@@ -306,7 +312,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
             //System.out.println("REWARD: " + reward);
             if(FeatureExtractor.extractFeatures(observation, 0)[0][FeatureExtractor.MARIO_IN_FRONT_LEDGE] == 1 /*|| features[prevAction][FeatureExtractor.MARIO_CLOSE_TO_LEDGE] == 1)*/ && observation.mayMarioJump()){
                 jumpHigh(10);
-                System.out.println("MEEP");
+                //System.out.println("MEEP");
             }
             prevObv = observation;
             printWeights(weights);
@@ -321,7 +327,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
         
         int pickRand = randGen.nextInt(randomRange);
         int chosenAction = maxAction;
-        if(maxAction!= 2 && maxAction !=1) System.out.println("MAX ACTION: " + maxAction);
+        //if(maxAction!= 2 && maxAction !=1) System.out.println("MAX ACTION: " + maxAction);
         if(pickRand == 1 || pickRand == 2)
         {
             //System.out.println("RAND ACTION: " + chosenAction);
@@ -334,7 +340,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
                 highJumping = false;
             }
             setAction(A_RIGHT_ACTION);
-            System.out.println("JUMPING : " + jumpCounter);
+           // System.out.println("JUMPING : " + jumpCounter);
         }
             
 

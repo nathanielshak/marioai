@@ -37,7 +37,7 @@ public class Play {
         options.setAgent(controller);
         Task task = new ProgressTask(options);
         options.setMaxFPS(maxSpeed);
-        options.setVisualization(true);
+        options.setVisualization(false);
         options.setNumberOfTrials(numTrials);
         options.setMatlabFileName("");
         options.setLevelDifficulty(0);
