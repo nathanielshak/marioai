@@ -6,12 +6,9 @@ import ch.idsia.mario.environments.Environment;
 import ch.idsia.ai.agents.FeatureExtractor;
 import ch.idsia.tools.EvaluationInfo;
 import java.util.Random;
-<<<<<<< HEAD
 import ch.idsia.mario.engine.GlobalOptions;
 import ch.idsia.mario.engine.MarioComponent;
-=======
 import java.util.Arrays;
->>>>>>> 6d5c5c3683b0a148afc80e16686a2b55eb26de6a
 
 public class HelloWorld extends BasicAIAgent implements Agent
 {
@@ -44,6 +41,8 @@ public class HelloWorld extends BasicAIAgent implements Agent
     private int frames = NUM_FRAMES;
     private double pastXPos = 0;
     private Random randGen = new Random();
+    private int jumpCounter = 0;
+    private boolean highJumping = false;
 
 
 
@@ -228,65 +227,86 @@ public class HelloWorld extends BasicAIAgent implements Agent
 
         return action;
     }*/
+
+    private void jumpHigh(int frames){
+        highJumping = true;
+        jumpCounter = frames;
+    }
     
     public boolean[] getAction(Environment observation)
     {
         /*if(GlobalOptions.getMarioComponent().getStatus() == Mario.STATUS_DEAD){
             System.out.println("HEEEEES DEEAAAAD!");
         }*/
-        if(prevObv == null)
-        { //first action
-           
+        if(!highJumping){
+            if(prevObv == null)
+            { //first action
+               
+                prevObv = observation;
+                prevAction = A_RIGHT_ACTION;
+                setAction(A_RIGHT_ACTION);
+                return action;
+            }
+
+
+            //prevObv = observation;
+            double[][] features = FeatureExtractor.extractFeatures(prevObv, prevAction);
+            double curQ = calcQ(features, weights, prevAction);
+            double maxActionVal = -10000000;
+            int maxAction = 0;
+            double reward = 0;
+            for(int i = 0; i < FeatureExtractor.NUM_ACTIONS; i++)
+            {
+                //System.out.println("Mario can jump? " + observation.mayMarioJump());
+                //System.out.println("checking action: " + i);
+                //if(uselessAction(i, observation)){
+                    //System.out.println("WE GOT A USELESS ACTION: " + i);
+                    //continue;
+                //}
+                double[][] curFeatures = FeatureExtractor.extractFeatures(observation, i);
+                double qValue = calcQ(curFeatures, weights, i);
+                //System.out.println("Q = " + qValue);
+                if(qValue >= maxActionVal) {
+                    maxActionVal = qValue;
+                    maxAction = i;
+                    reward = maxActionVal;
+                }
+            }
+            double error = curQ - (reward(observation) + DISCOUNT * maxActionVal);
+            incremementWeights(error, prevAction);
+            
+            int pickRand = randGen.nextInt(randomRange);
+            int chosenAction = maxAction;
+            //System.out.println("MAX ACTION: " + maxAction);
+            if(pickRand == 1 || pickRand == 2)
+            {
+                //System.out.println("RAND ACTION: " + chosenAction);
+                chosenAction = randGen.nextInt(FeatureExtractor.NUM_ACTIONS);
+                //System.out.println("RANDOM: " + chosenAction);
+            } else{
+                //System.out.println("MAX ACTION: " + chosenAction);
+            }
+            //System.out.println("REWARD: " + reward);
+            if(FeatureExtractor.extractFeatures(observation, 0)[0][FeatureExtractor.MARIO_IN_FRONT_LEDGE] == 1 /*|| features[prevAction][FeatureExtractor.MARIO_CLOSE_TO_LEDGE] == 1)*/ && observation.mayMarioJump()){
+                jumpHigh(10);
+                System.out.println("MEEP");
+            }
             prevObv = observation;
-            prevAction = A_RIGHT_ACTION;
-            setAction(A_RIGHT_ACTION);
-            return action;
-        }
-
-
-        //prevObv = observation;
-        double[][] features = FeatureExtractor.extractFeatures(prevObv, prevAction);
-        double curQ = calcQ(features, weights, prevAction);
-        double maxActionVal = -10000000;
-        int maxAction = 0;
-        double reward = 0;
-        for(int i = 0; i < FeatureExtractor.NUM_ACTIONS; i++)
-        {
-            //System.out.println("Mario can jump? " + observation.mayMarioJump());
-            //System.out.println("checking action: " + i);
-            if(uselessAction(i, observation)){
-                //System.out.println("WE GOT A USELESS ACTION: " + i);
-                continue;
-            }
-            double[][] curFeatures = FeatureExtractor.extractFeatures(observation, i);
-            double qValue = calcQ(curFeatures, weights, i);
-            //System.out.println("Q = " + qValue);
-            if(qValue >= maxActionVal) {
-                maxActionVal = qValue;
-                maxAction = i;
-                reward = maxActionVal;
-            }
-        }
-        double error = curQ - (reward(observation) + DISCOUNT * maxActionVal);
-        incremementWeights(error, prevAction);
-        
-        int pickRand = randGen.nextInt(randomRange);
-        int chosenAction = maxAction;
-        //System.out.println("MAX ACTION: " + maxAction);
-        if(pickRand == 1 || pickRand == 2)
-        {
-            //System.out.println("RAND ACTION: " + chosenAction);
-            chosenAction = randGen.nextInt(FeatureExtractor.NUM_ACTIONS);
-            //System.out.println("RANDOM: " + chosenAction);
+            printWeights(weights);
+            setAction(chosenAction);
+            
+            frames --;
+            prevAction = chosenAction;
         } else{
-            //System.out.println("MAX ACTION: " + chosenAction);
+            jumpCounter --;
+            if(jumpCounter <= 0){
+                highJumping = false;
+            }
+            setAction(A_RIGHT_ACTION);
+            System.out.println("JUMPING : " + jumpCounter);
         }
-        //System.out.println("REWARD: " + reward);
-        printWeights(weights);
-        setAction(chosenAction);
-        prevObv = observation;
-        frames --;
-        prevAction = chosenAction;
+            
+
         return action;
     }
 

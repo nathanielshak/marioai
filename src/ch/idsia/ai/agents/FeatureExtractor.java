@@ -11,7 +11,7 @@ public class FeatureExtractor {
 	//Objects
 	private static final Point MARIO_LOCATION = new Point(11,11);
 	private static final int LEDGE = -10;
-	private static final int PIPE = 2;
+	private static final int PIPE = 20;
 	private static final int FLOATING_LEDGE = -11;
 	private static final int SMALL_LEDGE_RANGE = 1;
 	private static final int MEDIUM_LEDGE_RANGE = 2;
@@ -217,6 +217,7 @@ public class FeatureExtractor {
     }
 
 	public static double[][] extractFeatures(Environment observation, int action) {
+		//print2dLevel(observation.getLevelSceneObservation());
 		double[][] features = new double[NUM_ACTIONS][NUM_FEATURES];
 		for(int curAction = 0; curAction < NUM_ACTIONS; curAction++)
 		{
@@ -264,6 +265,8 @@ public class FeatureExtractor {
 		features[action][ENEMY_BEHIND] = 0;
 		features[action][ENEMY_FRONT] = 0;
 		features[action][ENEMY_CLOSE] = setEnemyClose(enemyScene, features, action) == true ? 1:0;
+
+
 
 		//System.out.print("Printing Level\n");
 		//print2dArray(features);
