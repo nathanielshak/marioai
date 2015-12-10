@@ -94,6 +94,11 @@ public class HumanKeyboardAgent extends KeyAdapter implements Agent
         System.out.println("MARIO_NOT_CLOSE_TO_LEDGE: " + curFeatures[0][FeatureExtractor.MARIO_NOT_CLOSE_TO_LEDGE]);
         System.out.println("IN_FRONT_OF_LEDGE_JUMPED: " + curFeatures[0][FeatureExtractor.IN_FRONT_OF_LEDGE_JUMPED]);
         System.out.println("AIR_FACING_LEDGE: " + curFeatures[0][FeatureExtractor.AIR_FACING_LEDGE]);
+        System.out.println("ENEMY_CLOSE: " + curFeatures[0][FeatureExtractor.ENEMY_CLOSE]);
+        System.out.println("ENEMY_ABOVE: " + curFeatures[0][FeatureExtractor.ENEMY_ABOVE]);
+        System.out.println("ENEMY_BEHIND: " + curFeatures[0][FeatureExtractor.ENEMY_BEHIND]);
+        System.out.println("ENEMY_BELOW: " + curFeatures[0][FeatureExtractor.ENEMY_BELOW]);
+        System.out.println("ENEMY_FRONT: " + curFeatures[0][FeatureExtractor.ENEMY_FRONT]);
     }
 
     public AGENT_TYPE getType() {        return AGENT_TYPE.HUMAN;    }
@@ -127,7 +132,6 @@ public class HumanKeyboardAgent extends KeyAdapter implements Agent
             case KeyEvent.VK_DOWN:
                 Action[Mario.KEY_DOWN] = isPressed;
                 break;
-
             case KeyEvent.VK_S:
                 Action[Mario.KEY_JUMP] = isPressed;
                 break;
