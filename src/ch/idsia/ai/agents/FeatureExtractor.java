@@ -17,10 +17,11 @@ public class FeatureExtractor {
 	private static final int MEDIUM_LEDGE_RANGE = 2;
 	private static final int CLOSE_TO_LEDGE_BEGIN = 2;
 	private static final int CLOSE_TO_LEDGE_END = 4;
+	private static final int CLOSE_ENEMY_RANGE = 3;
 
 	//Features
 	public static final int NUM_ACTIONS = 5;
-	public static final int NUM_FEATURES =13;
+	public static final int NUM_FEATURES =18;
 
 	//Features Indices
 	public static final int ON_GROUND = 0;
@@ -37,6 +38,12 @@ public class FeatureExtractor {
 	public static final int IN_FRONT_OF_LEDGE_JUMPED = 11;
 	public static final int AIR_FACING_LEDGE = 12;
 
+	//Enemy Indices
+	public static final int ENEMY_CLOSE = 13;
+	public static final int ENEMY_FRONT = 14;
+	public static final int ENEMY_BEHIND = 15;
+	public static final int ENEMY_BELOW = 16;
+	public static final int ENEMY_ABOVE = 17;
 
 	//Stuff *Come back and name this*
 	private static float prevMarioPos = 0;
@@ -176,6 +183,39 @@ public class FeatureExtractor {
     	return (ledgeInFront < ledgeBelow);
     }
 
+    public static boolean setEnemyClose(byte[][] enemyScene, double[][] features, int action){
+    	boolean enemyNear = false;
+    	for(int x = MARIO_LOCATION.x - CLOSE_ENEMY_RANGE; x < MARIO_LOCATION.x + CLOSE_ENEMY_RANGE; x ++)
+    	{
+    		for(int y = MARIO_LOCATION.y - CLOSE_ENEMY_RANGE; y < MARIO_LOCATION.y + CLOSE_ENEMY_RANGE; y ++)
+    		{
+    			if(x == MARIO_LOCATION.x ^ y == MARIO_LOCATION.y)
+    			{
+    				if(enemyScene[y][x] != 0)
+    				{
+    					if(y > MARIO_LOCATION.y )
+    					{
+    						features[action][ENEMY_BELOW] = 1;
+    					}
+    					if(y < MARIO_LOCATION.y )
+    					{
+    						features[action][ENEMY_ABOVE] = 1;
+    					}
+    					if(x < MARIO_LOCATION.x )
+    					{
+    						features[action][ENEMY_BEHIND] = 1;
+    					}
+    					if(x > MARIO_LOCATION.x )
+    					{
+    						features[action][ENEMY_FRONT] = 1;
+    					}
+    				}
+    			}
+    		}
+    	}
+    	return enemyNear;
+    }
+
 	public static double[][] extractFeatures(Environment observation, int action) {
 		double[][] features = new double[NUM_ACTIONS][NUM_FEATURES];
 		for(int curAction = 0; curAction < NUM_ACTIONS; curAction++)
@@ -212,10 +252,19 @@ public class FeatureExtractor {
 		//Jumped facing ledge
 		features[action][IN_FRONT_OF_LEDGE_JUMPED] = inFrontOfLedgeJumped(observation, facingLedge, levelScene) ? 1:0;
 
-		//In air facing ledge
-		features[action][AIR_FACING_LEDGE] = (facingLedge && !observation.isMarioOnGround() && observation.mayMarioJump()) ? 1:0;
+		//In air facing ledge	
 		
-		
+		features[action][AIR_FACING_LEDGE] = (facingLedge && !observation.isMarioOnGround()) ? 1:0;
+		//System.out.println("FACING LEDGE JUMPED");
+
+		//Enemy proximity features
+		byte [][] enemyScene = observation.getEnemiesObservation(); 
+		features[action][ENEMY_BELOW] = 0;
+		features[action][ENEMY_ABOVE] = 0;
+		features[action][ENEMY_BEHIND] = 0;
+		features[action][ENEMY_FRONT] = 0;
+		features[action][ENEMY_CLOSE] = setEnemyClose(enemyScene, features, action) == true ? 1:0;
+
 		//System.out.print("Printing Level\n");
 		//print2dArray(features);
 		//System.out.print("\n\n\n\n");
@@ -225,6 +274,5 @@ public class FeatureExtractor {
 		return features;
 	}
 
-
-
 }
+
