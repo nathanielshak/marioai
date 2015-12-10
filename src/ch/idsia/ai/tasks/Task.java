@@ -2,6 +2,7 @@ package ch.idsia.ai.tasks;
 
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.tools.EvaluationOptions;
+import ch.idsia.tools.EvaluationInfo;
 
 /**
  * Created by IntelliJ IDEA.
@@ -16,5 +17,7 @@ public interface Task {
     public void setOptions (EvaluationOptions options);
 
     public EvaluationOptions getOptions ();
+
+    public EvaluationInfo evalInfo();
 
 }

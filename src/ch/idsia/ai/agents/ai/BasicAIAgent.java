@@ -38,4 +38,6 @@ public class BasicAIAgent implements Agent
     public String getName() {        return name;    }
 
     public void setName(String Name) { this.name = Name;    }
+
+    public void signalStatus(int status){}
 }

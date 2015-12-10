@@ -46,6 +46,10 @@ public class HumanKeyboardAgent extends KeyAdapter implements Agent
     private static final int AIR_FACING_LEDGE = 12;
     */
 
+    private static final double MODE_WEIGHT = 0;
+    private static final double PROGRESS_WEIGHT = 5;
+    private static final double Y_PROGRESS_WEIGHT = 1;
+
     private static double[][] curFeatures;
 
     public HumanKeyboardAgent()
@@ -81,10 +85,34 @@ public class HumanKeyboardAgent extends KeyAdapter implements Agent
         /*
         System.out.println("Features:");
         printFeatures();
+
+        //System.out.println("REWARD: " + reward(observation));
+
         */
        
         return Action;
     }
+
+/*
+    public double reward(Environment observation){
+        if(Mario.getStatus() == Mario.STATUS_DEAD){
+
+        }
+        double marioModeScore = (observation.getMarioMode() - prevMarioMode) * MODE_WEIGHT;
+        double marioProgressScore = (observation.getMarioFloatPos()[0] - prevXPos - 1) * PROGRESS_WEIGHT;
+        prevMarioMode = observation.getMarioMode();
+        prevXPos = observation.getMarioFloatPos()[0];
+        double marioYProgress = (prevYPos - observation.getMarioFloatPos()[1]) * Y_PROGRESS_WEIGHT;
+        if(observation.isMarioOnGround())
+        {
+            prevYPos = observation.getMarioFloatPos()[1];
+        } else{
+            marioYProgress = 0;
+        }
+        double reward = marioProgressScore + marioYProgress;
+        return marioProgressScore + marioYProgress;
+    }
+*/
 
     private void printFeatures(){
         /*
