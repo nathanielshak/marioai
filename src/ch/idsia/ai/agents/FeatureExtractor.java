@@ -21,7 +21,7 @@ public class FeatureExtractor {
 
 	//Features
 	public static final int NUM_ACTIONS = 5;
-	public static final int NUM_FEATURES = 25;
+	public static final int NUM_FEATURES = 31;
 
 	//Features Indices
 	//public static final int ON_GROUND = 0;
@@ -64,6 +64,16 @@ public class FeatureExtractor {
 	public static final int Q6_MED = 22;
 	public static final int Q7_MED = 23;
 	public static final int Q8_MED = 24;
+
+	//farther features forward
+	public static final int Q1_FAR = 25;
+	public static final int Q2_FAR = 26;
+	public static final int Q3_FAR = 27;
+
+	//even farther features forward
+	public static final int Q1_FARTHER = 28;
+	public static final int Q2_FARTHER = 29;
+	public static final int Q3_FARTHER = 30;
 
 	//Stuff *Come back and name this*
 	private static float prevMarioPos = 0;
@@ -235,6 +245,36 @@ public class FeatureExtractor {
     	}
     }
 
+    public static void setEnemyFar(byte[][] enemyScene, double[][] features, int action){
+    	int x = MARIO_LOCATION.x;
+    	int y = MARIO_LOCATION.y;
+    	if(enemyScene[y - 1][x + 3] != 0 || enemyScene[y - 1][x + 4] != 0){
+    		features[action][Q1_FAR] = 1;
+    	}
+    	else if(enemyScene[y][x + 3] != 0 || enemyScene[y][x + 4] != 0){
+    		features[action][Q2_FAR] = 1;
+    	}
+    	else if(enemyScene[y + 1][x + 3] != 0 || enemyScene[y + 1][x + 4] != 0){
+    		features[action][Q3_FAR] = 1;
+    	}
+    }
+
+
+
+    public static void setEnemyFarther(byte[][] enemyScene, double[][] features, int action){
+    	int x = MARIO_LOCATION.x;
+    	int y = MARIO_LOCATION.y;
+    	if(enemyScene[y - 1][x + 5] != 0 || enemyScene[y - 1][x + 6] != 0){
+    		features[action][Q1_FAR] = 1;
+    	}
+    	else if(enemyScene[y][x + 5] != 0 || enemyScene[y][x + 6] != 0){
+    		features[action][Q2_FAR] = 1;
+    	}
+    	else if(enemyScene[y + 1][x + 5] != 0 || enemyScene[y + 1][x + 6] != 0){
+    		features[action][Q3_FAR] = 1;
+    	}
+    }
+
     public static void setEnemyMed(byte[][] enemyScene, double[][] features, int action){
     	int marioX = MARIO_LOCATION.x;
     	int marioY = MARIO_LOCATION.y;
@@ -347,6 +387,9 @@ public class FeatureExtractor {
 
 		setEnemyMed(enemyScene, features, action);
 
+		setEnemyFar(enemyScene, features, action);
+
+		setEnemyFarther(enemyScene, features, action);
 
 
 		//System.out.print("Printing Level\n");
