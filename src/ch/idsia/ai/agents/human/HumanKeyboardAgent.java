@@ -66,8 +66,8 @@ public class HumanKeyboardAgent extends KeyAdapter implements Agent
 
     public boolean[] getAction(Environment observation)
     {
-        System.out.println("x: " + observation.getMarioFloatPos()[0]);
-        System.out.println("y: " + observation.getMarioFloatPos()[1]);
+        //System.out.println("x: " + observation.getMarioFloatPos()[0]);
+        //System.out.println("y: " + observation.getMarioFloatPos()[1]);
         float[] enemiesPos = observation.getEnemiesFloatPos();
         boolean print = false;
         for(int i=0; i< Action.length; i++){
@@ -84,13 +84,13 @@ public class HumanKeyboardAgent extends KeyAdapter implements Agent
     */
 
         curFeatures = FeatureExtractor.extractFeatures(observation, 0);
-        /*
+        
         System.out.println("Features:");
         printFeatures();
 
         //System.out.println("REWARD: " + reward(observation));
 
-        */
+        
        
         return Action;
     }
@@ -117,26 +117,26 @@ public class HumanKeyboardAgent extends KeyAdapter implements Agent
 */
 
     private void printFeatures(){
-        /*
-        System.out.println("ON_GROUND: " + curFeatures[0][FeatureExtractor.ON_GROUND]);
-        System.out.println("CAN_JUMP: " + curFeatures[0][FeatureExtractor.CAN_JUMP]);
+        
+        //System.out.println("ON_GROUND: " + curFeatures[0][FeatureExtractor.ON_GROUND]);
+        //System.out.println("CAN_JUMP: " + curFeatures[0][FeatureExtractor.CAN_JUMP]);
         System.out.println("DANGER_OF_GAP: " + curFeatures[0][FeatureExtractor.DANGER_OF_GAP]);
-        System.out.println("MARIO_FACING_LEDGE: " + curFeatures[0][FeatureExtractor.MARIO_FACING_LEDGE]);
+        //System.out.println("MARIO_FACING_LEDGE: " + curFeatures[0][FeatureExtractor.MARIO_FACING_LEDGE]);
         System.out.println("SMALL_LEDGE: " + curFeatures[0][FeatureExtractor.SMALL_LEDGE]);
         System.out.println("MEDIUM_LEDGE: " + curFeatures[0][FeatureExtractor.MEDIUM_LEDGE]);
         System.out.println("LARGE_LEDGE: " + curFeatures[0][FeatureExtractor.LARGE_LEDGE]);
         System.out.println("MARIO_IS_STUCK: " + curFeatures[0][FeatureExtractor.MARIO_IS_STUCK]);
         System.out.println("MARIO_IN_FRONT_LEDGE: " + curFeatures[0][FeatureExtractor.MARIO_IN_FRONT_LEDGE]);
         System.out.println("MARIO_CLOSE_TO_LEDGE: " + curFeatures[0][FeatureExtractor.MARIO_CLOSE_TO_LEDGE]);
-        System.out.println("MARIO_NOT_CLOSE_TO_LEDGE: " + curFeatures[0][FeatureExtractor.MARIO_NOT_CLOSE_TO_LEDGE]);
-        System.out.println("IN_FRONT_OF_LEDGE_JUMPED: " + curFeatures[0][FeatureExtractor.IN_FRONT_OF_LEDGE_JUMPED]);
-        System.out.println("AIR_FACING_LEDGE: " + curFeatures[0][FeatureExtractor.AIR_FACING_LEDGE]);
-        System.out.println("ENEMY_CLOSE: " + curFeatures[0][FeatureExtractor.ENEMY_CLOSE]);
-        System.out.println("ENEMY_ABOVE: " + curFeatures[0][FeatureExtractor.ENEMY_ABOVE]);
-        System.out.println("ENEMY_BEHIND: " + curFeatures[0][FeatureExtractor.ENEMY_BEHIND]);
-        System.out.println("ENEMY_BELOW: " + curFeatures[0][FeatureExtractor.ENEMY_BELOW]);
-        System.out.println("ENEMY_FRONT: " + curFeatures[0][FeatureExtractor.ENEMY_FRONT]);
-        */
+        //System.out.println("MARIO_NOT_CLOSE_TO_LEDGE: " + curFeatures[0][FeatureExtractor.MARIO_NOT_CLOSE_TO_LEDGE]);
+        //System.out.println("IN_FRONT_OF_LEDGE_JUMPED: " + curFeatures[0][FeatureExtractor.IN_FRONT_OF_LEDGE_JUMPED]);
+        //System.out.println("AIR_FACING_LEDGE: " + curFeatures[0][FeatureExtractor.AIR_FACING_LEDGE]);
+        //System.out.println("ENEMY_CLOSE: " + curFeatures[0][FeatureExtractor.ENEMY_CLOSE]);
+        //System.out.println("ENEMY_ABOVE: " + curFeatures[0][FeatureExtractor.ENEMY_ABOVE]);
+        //System.out.println("ENEMY_BEHIND: " + curFeatures[0][FeatureExtractor.ENEMY_BEHIND]);
+        //System.out.println("ENEMY_BELOW: " + curFeatures[0][FeatureExtractor.ENEMY_BELOW]);
+        //System.out.println("ENEMY_FRONT: " + curFeatures[0][FeatureExtractor.ENEMY_FRONT]);
+        
         
     }
 

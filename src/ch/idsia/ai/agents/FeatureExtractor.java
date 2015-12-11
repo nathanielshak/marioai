@@ -21,7 +21,7 @@ public class FeatureExtractor {
 
 	//Features
 	public static final int NUM_ACTIONS = 5;
-	public static final int NUM_FEATURES = 31;
+	public static final int NUM_FEATURES = 34;
 
 	//Features Indices
 	//public static final int ON_GROUND = 0;
@@ -75,6 +75,11 @@ public class FeatureExtractor {
 	public static final int Q2_FARTHER = 29;
 	public static final int Q3_FARTHER = 30;
 
+	//gaps
+	public static final int GAP_CLOSE = 31;
+	public static final int GAP_MED = 32;
+	public static final int GAP_FAR = 33;
+
 	//Stuff *Come back and name this*
 	private static float prevMarioPos = 0;
 	private static boolean detectY = false;
@@ -103,9 +108,26 @@ public class FeatureExtractor {
         }
     }
 
+    public static boolean gapExists(byte[][] levelScene, int beginX, int endX){
+    	for(int x = beginX; x <= endX; x ++){
+    		boolean columnGap = true;
+    		for(int y = 12; y < 22; y ++ ){
+    			if(levelScene[y][x] != 0){
+    				columnGap = false;
+    				break;
+    			}
+    		}
+    		if(columnGap){
+    			return true;
+    		}
+    	}
+    	return false;
+    }
+
+
 	private static boolean DangerOfGap(byte[][] levelScene)
     {
-        for (int x = 9; x < 13; ++x)
+        for (int x = 11; x < 12; ++x)
         {
             boolean f = true;
             for(int y = 12; y < 22; ++y)
@@ -334,6 +356,8 @@ public class FeatureExtractor {
 	    }
     }
 
+
+
 	public static double[][] extractFeatures(Environment observation, int action) {
 		/*System.out.println("__________________");
 		print2dLevel(observation.getLevelSceneObservation());
@@ -391,6 +415,9 @@ public class FeatureExtractor {
 
 		setEnemyFarther(enemyScene, features, action);
 
+		features[action][GAP_CLOSE] = gapExists(levelScene, 12, 14) ? 1:0;
+		features[action][GAP_MED] = gapExists(levelScene, 15, 17) ? 1:0;
+		features[action][GAP_FAR] = gapExists(levelScene, 17, 19) ? 1:0;
 
 		//System.out.print("Printing Level\n");
 		//print2dArray(features);
