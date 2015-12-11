@@ -15,13 +15,14 @@ public class FeatureExtractor {
 	private static final int FLOATING_LEDGE = -11;
 	private static final int SMALL_LEDGE_RANGE = 1;
 	private static final int MEDIUM_LEDGE_RANGE = 2;
+	private static final int LARGE_LEDGE_RANGE = 3;
 	private static final int CLOSE_TO_LEDGE_BEGIN = 2;
 	private static final int CLOSE_TO_LEDGE_END = 4;
 	private static final int CLOSE_ENEMY_RANGE = 2;
 
 	//Features
 	public static final int NUM_ACTIONS = 5;
-	public static final int NUM_FEATURES = 31;
+	public static final int NUM_FEATURES = 35;
 
 	//Features Indices
 	//public static final int ON_GROUND = 0;
@@ -32,6 +33,7 @@ public class FeatureExtractor {
 	public static final int SMALL_LEDGE = 2;
 	public static final int MEDIUM_LEDGE = 3;
 	public static final int LARGE_LEDGE = 4;
+	public static final int LARGER_LEDGE = 34;
 	public static final int MARIO_IS_STUCK = 5;
 	public static final int MARIO_IN_FRONT_LEDGE = 6;
 	public static final int MARIO_CLOSE_TO_LEDGE = 7;
@@ -75,6 +77,12 @@ public class FeatureExtractor {
 	public static final int Q2_FARTHER = 29;
 	public static final int Q3_FARTHER = 30;
 
+	//gaps
+	public static final int GAP_CLOSE = 31;
+	public static final int GAP_MED = 32;
+	public static final int GAP_FAR = 33;
+	//larger ledge is 34
+
 	//Stuff *Come back and name this*
 	private static float prevMarioPos = 0;
 	private static boolean detectY = false;
@@ -103,9 +111,26 @@ public class FeatureExtractor {
         }
     }
 
+    public static boolean gapExists(byte[][] levelScene, int beginX, int endX){
+    	for(int x = beginX; x <= endX; x ++){
+    		boolean columnGap = true;
+    		for(int y = 12; y < 22; y ++ ){
+    			if(levelScene[y][x] != 0){
+    				columnGap = false;
+    				break;
+    			}
+    		}
+    		if(columnGap){
+    			return true;
+    		}
+    	}
+    	return false;
+    }
+
+
 	private static boolean DangerOfGap(byte[][] levelScene)
     {
-        for (int x = 9; x < 13; ++x)
+        for (int x = 11; x < 12; ++x)
         {
             boolean f = true;
             for(int y = 12; y < 22; ++y)
@@ -147,10 +172,11 @@ public class FeatureExtractor {
     		int yPos = 0;
     		if(levelScene[MARIO_LOCATION.y][x] == LEDGE || levelScene[MARIO_LOCATION.y][x] == PIPE)
     		{
-    			for(int y = MARIO_LOCATION.y; y > MARIO_LOCATION.y - 4; y--)
+    			for(int y = MARIO_LOCATION.y; y > MARIO_LOCATION.y - 7; y--)
     			{
-    				if(levelScene[x][y] == LEDGE || levelScene[x][y] == PIPE)
+    				if(levelScene[y][x] == LEDGE || levelScene[y][x] == PIPE)
     				{
+    					//System.out.println("LEDGE AT: " + x + " y: " + y);
     					yPos ++;
     				}
     				
@@ -334,6 +360,8 @@ public class FeatureExtractor {
 	    }
     }
 
+
+
 	public static double[][] extractFeatures(Environment observation, int action) {
 		/*System.out.println("__________________");
 		print2dLevel(observation.getLevelSceneObservation());
@@ -361,7 +389,8 @@ public class FeatureExtractor {
 		//features[action][MARIO_FACING_LEDGE] = 0;
 		features[action][SMALL_LEDGE] = LedgeRange(levelScene) == SMALL_LEDGE_RANGE ? 1: 0;
 		features[action][MEDIUM_LEDGE] = LedgeRange(levelScene) == MEDIUM_LEDGE_RANGE ? 1: 0;
-		features[action][LARGE_LEDGE] = LedgeRange(levelScene) > MEDIUM_LEDGE_RANGE ? 1: 0;
+		features[action][LARGE_LEDGE] = LedgeRange(levelScene) == LARGE_LEDGE_RANGE ? 1: 0;
+		features[action][LARGER_LEDGE] = LedgeRange(levelScene) > LARGE_LEDGE_RANGE ? 1: 0;
 		float currXPos = observation.getMarioFloatPos()[0];
 		features[action][MARIO_IS_STUCK] = MarioIsStuck(currXPos, facingLedge) ? 1: 0;
 
@@ -391,6 +420,9 @@ public class FeatureExtractor {
 
 		setEnemyFarther(enemyScene, features, action);
 
+		features[action][GAP_CLOSE] = gapExists(levelScene, 12, 14) ? 1:0;
+		features[action][GAP_MED] = gapExists(levelScene, 15, 17) ? 1:0;
+		features[action][GAP_FAR] = gapExists(levelScene, 17, 19) ? 1:0;
 
 		//System.out.print("Printing Level\n");
 		//print2dArray(features);
