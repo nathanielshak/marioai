@@ -18,7 +18,7 @@ import ch.idsia.mario.engine.sprites.Mario;
 public class Play {
 
     public static void main(String[] args) {
-        boolean observe = false;
+        boolean observe = true;
         Agent controller = new HumanKeyboardAgent();
         boolean maxSpeed = false;
         int difficulty = 0;
