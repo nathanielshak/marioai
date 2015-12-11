@@ -66,6 +66,8 @@ public class HumanKeyboardAgent extends KeyAdapter implements Agent
 
     public boolean[] getAction(Environment observation)
     {
+        System.out.println("x: " + observation.getMarioFloatPos()[0]);
+        System.out.println("y: " + observation.getMarioFloatPos()[1]);
         float[] enemiesPos = observation.getEnemiesFloatPos();
         boolean print = false;
         for(int i=0; i< Action.length; i++){
@@ -180,5 +182,9 @@ public class HumanKeyboardAgent extends KeyAdapter implements Agent
 
    public List<boolean[]> getHistory () {
        return history;
+   }
+
+   public void signalStatus(int status){
+
    }
 }

@@ -21,29 +21,30 @@ public class FeatureExtractor {
 
 	//Features
 	public static final int NUM_ACTIONS = 5;
-	public static final int NUM_FEATURES =18;
+	public static final int NUM_FEATURES = 13;
 
 	//Features Indices
-	public static final int ON_GROUND = 0;
-	public static final int CAN_JUMP = 1;
-	public static final int DANGER_OF_GAP = 2;
-	public static final int MARIO_FACING_LEDGE = 3;
-	public static final int SMALL_LEDGE = 4;
-	public static final int MEDIUM_LEDGE = 5;
-	public static final int LARGE_LEDGE = 6;
-	public static final int MARIO_IS_STUCK = 7;
-	public static final int MARIO_IN_FRONT_LEDGE = 8;
-	public static final int MARIO_CLOSE_TO_LEDGE = 9;
-	public static final int MARIO_NOT_CLOSE_TO_LEDGE = 10;
-	public static final int IN_FRONT_OF_LEDGE_JUMPED = 11;
-	public static final int AIR_FACING_LEDGE = 12;
+	//public static final int ON_GROUND = 0;
+	//public static final int CAN_JUMP = 1;
+	public static final int IN_FRONT_OF_LEDGE_JUMPED = 0;
+	public static final int DANGER_OF_GAP = 1;
+	//public static final int MARIO_FACING_LEDGE = 2;
+	public static final int SMALL_LEDGE = 2;
+	public static final int MEDIUM_LEDGE = 3;
+	public static final int LARGE_LEDGE = 4;
+	public static final int MARIO_IS_STUCK = 6;
+	public static final int MARIO_IN_FRONT_LEDGE = 7;
+	public static final int MARIO_CLOSE_TO_LEDGE = 8;
+	public static final int MARIO_NOT_CLOSE_TO_LEDGE = 9;
+	
+	//public static final int AIR_FACING_LEDGE = 11;
 
 	//Enemy Indices
-	public static final int ENEMY_CLOSE = 13;
-	public static final int ENEMY_FRONT = 14;
-	public static final int ENEMY_BEHIND = 15;
-	public static final int ENEMY_BELOW = 16;
-	public static final int ENEMY_ABOVE = 17;
+	
+	public static final int ENEMY_FRONT = 10;
+	public static final int ENEMY_BEHIND = 11;
+	public static final int ENEMY_BELOW = 12;
+	public static final int ENEMY_ABOVE = 5;
 
 	//Stuff *Come back and name this*
 	private static float prevMarioPos = 0;
@@ -99,16 +100,16 @@ public class FeatureExtractor {
     	System.out.print("\n");
     }
 
-    private static boolean FacingLedge(byte[][] levelScene){
+    private static int distanceToLedge(byte[][] levelScene){
     	for(int x = MARIO_LOCATION.x + 1; x < levelScene[0].length; x++)
     	{
     		if(levelScene[MARIO_LOCATION.y][x] == LEDGE || levelScene[MARIO_LOCATION.y][x] == PIPE)
     		{
-    			return true;
+    			return x;
     		}
     	}
 
-    	return false;
+    	return -1;
     }
 
     private static int LedgeRange(byte[][] levelScene){
@@ -136,6 +137,7 @@ public class FeatureExtractor {
     	return (prevMarioPos == currXPos) & facingLedge;
     }
 
+/*
     private static int DistanceToLedge(byte[][] levelScene, boolean facingLedge){
     	if(!facingLedge)
     	{
@@ -154,6 +156,7 @@ public class FeatureExtractor {
     	}
     	return 3;
     }
+*/
 
     private static boolean inFrontOfLedgeJumped(Environment observation, boolean facingLedge, byte[][] levelScene){
     	if(observation.isMarioOnGround() || facingLedge){
@@ -210,6 +213,7 @@ public class FeatureExtractor {
     					{
     						features[action][ENEMY_FRONT] = 1;
     					}
+    					enemyNear = true;
     				}
     			}
     		}
@@ -231,15 +235,15 @@ public class FeatureExtractor {
 			}
 		}
 		//populate features of taken action column
-		features[action][ON_GROUND] = observation.isMarioOnGround() ? 1 : 0;
-		features[action][CAN_JUMP] = observation.mayMarioJump() ? 1 : 0;
+		//features[action][ON_GROUND] = observation.isMarioOnGround() ? 1 : 0;
+		//features[action][CAN_JUMP] = observation.mayMarioJump() ? 1 : 0;
 		byte [][] levelScene = observation.getLevelSceneObservation();
 		features[action][DANGER_OF_GAP] = DangerOfGap(levelScene) ? 1 : 0;
 
 		//Ledge Features
-		boolean facingLedge = FacingLedge(levelScene);
+		boolean facingLedge = (distanceToLedge(levelScene) != -1);
 		/*DONT CARE*/
-		features[action][MARIO_FACING_LEDGE] = 0;
+		//features[action][MARIO_FACING_LEDGE] = 0;
 		features[action][SMALL_LEDGE] = LedgeRange(levelScene) == SMALL_LEDGE_RANGE ? 1: 0;
 		features[action][MEDIUM_LEDGE] = LedgeRange(levelScene) == MEDIUM_LEDGE_RANGE ? 1: 0;
 		features[action][LARGE_LEDGE] = LedgeRange(levelScene) > MEDIUM_LEDGE_RANGE ? 1: 0;
@@ -247,19 +251,19 @@ public class FeatureExtractor {
 		features[action][MARIO_IS_STUCK] = MarioIsStuck(currXPos, facingLedge) ? 1: 0;
 
 		//Ledge distance
-		
-		features[action][MARIO_IN_FRONT_LEDGE] = DistanceToLedge(levelScene, facingLedge) == 1 ? 1:0;
+		int distToLedge = distanceToLedge(levelScene);
+		features[action][MARIO_IN_FRONT_LEDGE] = distToLedge == 1 ? 1:0;
 		/*DONT CARE*/
-		features[action][MARIO_CLOSE_TO_LEDGE] = 0;
+		features[action][MARIO_CLOSE_TO_LEDGE] = (distToLedge >= 2 && distToLedge <= 4) ? 1:0; 
 		/*DONT CARE*/
-		features[action][MARIO_NOT_CLOSE_TO_LEDGE] = 0;
+		features[action][MARIO_NOT_CLOSE_TO_LEDGE] = distToLedge == -1 ? 1:0;
 
 		//Jumped facing ledge
 		features[action][IN_FRONT_OF_LEDGE_JUMPED] = inFrontOfLedgeJumped(observation, facingLedge, levelScene) ? 1:0;
 
 		//In air facing ledge	
 		
-		features[action][AIR_FACING_LEDGE] = (facingLedge && !observation.isMarioOnGround()) ? 1:0;
+		//features[action][AIR_FACING_LEDGE] = (facingLedge && !observation.isMarioOnGround()) ? 1:0;
 		//System.out.println("FACING LEDGE JUMPED");
 
 		//Enemy proximity features
@@ -268,7 +272,7 @@ public class FeatureExtractor {
 		features[action][ENEMY_ABOVE] = 0;
 		features[action][ENEMY_BEHIND] = 0;
 		features[action][ENEMY_FRONT] = 0;
-		features[action][ENEMY_CLOSE] = setEnemyClose(enemyScene, features, action) == true ? 1:0;
+		setEnemyClose(enemyScene, features, action);
 
 
 

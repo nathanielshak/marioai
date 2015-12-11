@@ -28,8 +28,8 @@ public class HelloWorld extends BasicAIAgent implements Agent
     private static final double STEP_SIZE = 0.1;
 
     private static final double MODE_WEIGHT = 5;
-    private static final double PROGRESS_WEIGHT = 0.2;
-    private static final double Y_PROGRESS_WEIGHT = 0;
+    private static final double PROGRESS_WEIGHT = 0.5;
+    private static final double Y_PROGRESS_WEIGHT = 1;
     private static final double MARIO_STUCK_WEIGHT = 0;
 
     private Environment prevObv;
@@ -46,18 +46,10 @@ public class HelloWorld extends BasicAIAgent implements Agent
     private int jumpCounter = 0;
     private boolean highJumping = false;
 
-    private boolean training = true;
+    private boolean training = false;
 
     private double[][] weights = new double[FeatureExtractor.NUM_ACTIONS][FeatureExtractor.NUM_FEATURES];
-    private double[][] testWeights = new double[][]{{7443203.452177169, 6375929.130141851, 0.0, 0.0, 55450.536791966755, 350421.2752935597, 4138338.0949846506, 0.0, 3823537.6623416487, 0.0, 0.0, 66046.5449445536, 1210133.4547858397, 0.0, 93707.73610877377, 209964.89257364662, 23992.430919815994, 30986.114255481523}, {7396927.428823305, 6420896.110576321, 0.0, 0.0, 55495.974009936486, 355627.0253948655, 4103985.0020787073, 0.0, 3860033.559927329, 0.0, 0.0, 123884.06453609436, 1194613.3887976396, 0.0, 84284.55434941401, 210697.42383732996, 20052.243294802487, 30820.50000533416}, {7929774.0500113545, 1256231.5534669664, 0.0, 0.0, 503673.2080292855, 472354.0228287712, 4992321.770590185, 0.0, 5306607.830251044, 0.0, 0.0, 0.0, 0.0, 0.0, 30950.257935016627, 206591.85875709567, 774.8754187763052, 33432.18523532562}, {7925168.155928818, 1840421.707538376, 0.0, 0.0, 382313.2877606263, 486040.01337463234, 4972289.347719243, 0.0, 5339261.130313682, 0.0, 0.0, 0.0, 0.0, 0.0, 26397.216176235415, 205938.4019361382, 8633.524356083437, 28373.70353886045}, {7924742.907738333, 3544010.337182883, 0.0, 0.0, 303058.48013390036, 497204.5642173105, 4970492.147797707, 0.0, 5339677.118154684, 0.0, 0.0, 0.0, 0.0, 0.0, 26640.80530015986, 212118.32632085402, 2196.2472653896707, 25696.62169124722}};
-
-
-
-
-
-
-
-
+    private double[][] testWeights = new double[][] {{0.0, 0.0, -0.10283598022460937, 0.2819175329589844, 4.744955619343215, 3.239314369767027, 0.0, 0.0, 0.0, 597.942324266404, 0.0, 15.947586541878668, 8.570591935293642}, {2.2695501674729797, 0.0, 1.0160904681412966, 0.4687838293457032, 10.073084799630543, 2.345844891039079, 0.0, 0.0, 0.0, 652.2468069184204, 6.484030454411871, 10.347108168883844, 0.7716064453125}, {0.0, 0.0, 0.0, 0.0, 5.561198814532237, -0.08952710883696238, 0.0, 0.0, 0.0, 625.3077358419347, 11.33157822807064, 15.031320129735875, 0.0}, {0.0, 0.0, 1.3600036621093752, 3.319175329589844, 14.059512853923973, -0.004459515582448149, 0.0, 0.0, 0.0, 638.7149130958053, 7.944456651341691, 5.01177399825145, 0.0}, {0.0, 0.0, 5.704101416013787, -0.4185594116210938, 9.13504606217589, -0.6294113677612265, 0.0, 0.0, 0.0, 654.4464272978299, 12.237471891153799, 11.020163455190312, 0.0}};
 
 
 
@@ -75,6 +67,10 @@ public class HelloWorld extends BasicAIAgent implements Agent
         
     }
 
+    public void signalStatus(int status){
+        System.out.println(Arrays.deepToString(weights));
+    }
+
     public void reset()
     {
         action = new boolean[Environment.numberOfButtons];// Empty action
@@ -84,6 +80,9 @@ public class HelloWorld extends BasicAIAgent implements Agent
         prevXPos = 0;
         prevMarioMode = 2;
         firstTrial = false;
+        prevObv = null;
+        highJumping = false;
+
         //print2dArray(weights);
         System.out.println(Arrays.deepToString(weights));
         //randomRange ++;
@@ -114,7 +113,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
         for(int i = 0; i < Environment.numberOfButtons; i++){
             action[i] = false;
         }
-        System.out.println(actionNum);
+        System.out.println("Setting Action: " + actionNum);
         switch(actionNum){
             /*case A_ACTION:
                 action[Mario.KEY_JUMP] = true;
@@ -173,6 +172,9 @@ public class HelloWorld extends BasicAIAgent implements Agent
             System.out.println("MODE CHANGE WOW: ");
         }
         double marioProgressScore = (observation.getMarioFloatPos()[0] - prevXPos - 1) * PROGRESS_WEIGHT;
+        if(prevXPos > observation.getMarioFloatPos()[0]){
+            marioProgressScore *= 3;
+        }
         prevMarioMode = observation.getMarioMode();
         
         double marioYProgress = (prevYPos - observation.getMarioFloatPos()[1]) * Y_PROGRESS_WEIGHT;
@@ -193,11 +195,12 @@ public class HelloWorld extends BasicAIAgent implements Agent
             if(Math.abs(observation.getMarioFloatPos()[0] - pastXPos) < 10)
             {
                 reward += MARIO_STUCK_WEIGHT;
+                System.out.println("STUCK");
             }
             frames = NUM_FRAMES;
             pastXPos = observation.getMarioFloatPos()[0];
         }
-        
+        System.out.println("reward: " + reward);
         return reward;
     }
 
@@ -215,6 +218,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
     }
 
     private void incremementWeights(double error, int action){
+        System.out.println("Incrementing action: " + action);
         double[][] features = FeatureExtractor.extractFeatures(prevObv, action);
         for(int i = 0; i < FeatureExtractor.NUM_FEATURES; i++){
             weights[action][i] -= features[action][i] * error * STEP_SIZE;
@@ -322,6 +326,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
     
     public boolean[] getAction(Environment observation)
     {
+        //System.out.println("_____________________________");
         if(highJumping){
             jumpCounter --;
             //System.out.println("JUMPING : " + jumpCounter);
@@ -365,12 +370,13 @@ public class HelloWorld extends BasicAIAgent implements Agent
         }else{
             curQ = calcQ(features, testWeights, prevAction);
         }
-        double maxActionVal = -10000000;
+        double vOpt = -10000000;
         int maxAction = 0;
         double reward = 0;
         for(int i = 0; i < FeatureExtractor.NUM_ACTIONS; i++)
         {
             if(uselessAction(i, observation)){
+                //System.out.println("USELESS: " + i);
                 continue;
             }
             double[][] curFeatures = FeatureExtractor.extractFeatures(observation, i);
@@ -382,13 +388,15 @@ public class HelloWorld extends BasicAIAgent implements Agent
                 qValue = calcQ(curFeatures, testWeights, i);
             }
             //System.out.println("Q = " + qValue);
-            if(qValue >= maxActionVal) {
-                maxActionVal = qValue;
+            //System.out.println("REWARD FOR ACTION " + i + " is: " + qValue);
+            if(qValue >= vOpt) {
+                
+                vOpt = qValue;
                 maxAction = i;
-                reward = maxActionVal;
+                reward = vOpt;
             }
         }
-        double error = curQ - (reward(observation) + DISCOUNT * maxActionVal);
+        double error = curQ - (reward(observation) + DISCOUNT * vOpt);
         /*MERP MERP*/
         if(training){
             incremementWeights(error, prevAction);
@@ -397,7 +405,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
         int pickRand = randGen.nextInt(randomRange);
         int chosenAction = maxAction;
         //System.out.println("MAX ACTION: " + maxAction);
-        if(pickRand == 1 || pickRand == 2)
+        if(pickRand == 1)
         {
             //System.out.println("RAND ACTION: " + chosenAction);
             /*MERRRRRRP*/
@@ -409,7 +417,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
             //System.out.println("MAX ACTION: " + chosenAction);
         }
 
-        //System.out.println("REWARD: " + reward);
+        
         /*if(FeatureExtractor.extractFeatures(observation, 0)[0][FeatureExtractor.MARIO_IN_FRONT_LEDGE] == 1  && observation.mayMarioJump()){
             jumpHigh(8);
             setAction(A_RIGHT_ACTION);
