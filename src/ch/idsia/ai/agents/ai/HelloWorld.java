@@ -33,7 +33,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
     private static final double MARIO_STUCK_WEIGHT = -5;
     private static final double KILLS_WEIGHT = 10;
     private static final double DEATH_WEIGHT = -40;
-    private static final double JUMP_X_BIAS = 2;
+    private static final double JUMP_X_BIAS = 0;
 
     private Environment prevObv;
     private int prevAction;
@@ -377,6 +377,15 @@ public class HelloWorld extends BasicAIAgent implements Agent
             }
             
         }
+
+        //hold actions while in air, so that prev obv stays how it was
+        if(!observation.isMarioOnGround()){
+            prevXPos = observation.getMarioFloatPos()[0] + JUMP_X_BIAS;
+            setAction(prevAction);
+            System.out.println("HOOOOOOLD");
+            return action;
+        }
+
         //System.out.println("WE NOT JUMPING");
         if(prevObv == null)
         { //first action
