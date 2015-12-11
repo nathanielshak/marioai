@@ -24,11 +24,11 @@ public class HelloWorld extends BasicAIAgent implements Agent
 
     //private static final int NUM_ACTIONS = 5;
     //private static final int NUM_FEATURES = 12;
-    private static final double DISCOUNT = .5;
+    private static final double DISCOUNT = 1;
     private static final double STEP_SIZE = 0.1;
 
     private static final double MODE_WEIGHT = 20;
-    private static final double PROGRESS_WEIGHT = 0.5;
+    private static final double PROGRESS_WEIGHT = 0.3;
     private static final double Y_PROGRESS_WEIGHT = 0.3;
     private static final double MARIO_STUCK_WEIGHT = -5;
     private static final double KILLS_WEIGHT = 10;

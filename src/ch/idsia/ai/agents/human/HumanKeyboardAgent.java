@@ -128,6 +128,9 @@ public class HumanKeyboardAgent extends KeyAdapter implements Agent
         System.out.println("MARIO_IS_STUCK: " + curFeatures[0][FeatureExtractor.MARIO_IS_STUCK]);
         System.out.println("MARIO_IN_FRONT_LEDGE: " + curFeatures[0][FeatureExtractor.MARIO_IN_FRONT_LEDGE]);
         System.out.println("MARIO_CLOSE_TO_LEDGE: " + curFeatures[0][FeatureExtractor.MARIO_CLOSE_TO_LEDGE]);
+        System.out.println("GAP_CLOSE: " + curFeatures[0][FeatureExtractor.GAP_CLOSE]);
+        System.out.println("GAP_MED: " + curFeatures[0][FeatureExtractor.GAP_MED]);
+        System.out.println("GAP_FAR: " + curFeatures[0][FeatureExtractor.GAP_FAR]);
         //System.out.println("MARIO_NOT_CLOSE_TO_LEDGE: " + curFeatures[0][FeatureExtractor.MARIO_NOT_CLOSE_TO_LEDGE]);
         //System.out.println("IN_FRONT_OF_LEDGE_JUMPED: " + curFeatures[0][FeatureExtractor.IN_FRONT_OF_LEDGE_JUMPED]);
         //System.out.println("AIR_FACING_LEDGE: " + curFeatures[0][FeatureExtractor.AIR_FACING_LEDGE]);
