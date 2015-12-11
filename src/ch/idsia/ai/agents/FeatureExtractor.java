@@ -21,7 +21,7 @@ public class FeatureExtractor {
 
 	//Features
 	public static final int NUM_ACTIONS = 5;
-	public static final int NUM_FEATURES = 13;
+	public static final int NUM_FEATURES = 25;
 
 	//Features Indices
 	//public static final int ON_GROUND = 0;
@@ -32,19 +32,38 @@ public class FeatureExtractor {
 	public static final int SMALL_LEDGE = 2;
 	public static final int MEDIUM_LEDGE = 3;
 	public static final int LARGE_LEDGE = 4;
-	public static final int MARIO_IS_STUCK = 6;
-	public static final int MARIO_IN_FRONT_LEDGE = 7;
-	public static final int MARIO_CLOSE_TO_LEDGE = 8;
-	public static final int MARIO_NOT_CLOSE_TO_LEDGE = 9;
+	public static final int MARIO_IS_STUCK = 5;
+	public static final int MARIO_IN_FRONT_LEDGE = 6;
+	public static final int MARIO_CLOSE_TO_LEDGE = 7;
+	public static final int MARIO_NOT_CLOSE_TO_LEDGE = 8;
 	
 	//public static final int AIR_FACING_LEDGE = 11;
 
 	//Enemy Indices
 	
-	public static final int ENEMY_FRONT = 10;
-	public static final int ENEMY_BEHIND = 11;
-	public static final int ENEMY_BELOW = 12;
-	public static final int ENEMY_ABOVE = 5;
+	//close features             
+	/* Quadrants:
+		4|3|2	
+		5| |1
+		6|7|8	*/
+	public static final int Q1_CLOSE = 9;
+	public static final int Q2_CLOSE = 10;
+	public static final int Q3_CLOSE = 11;
+	public static final int Q4_CLOSE = 12;
+	public static final int Q5_CLOSE = 13;
+	public static final int Q6_CLOSE = 14;
+	public static final int Q7_CLOSE = 15;
+	public static final int Q8_CLOSE = 16;
+
+	//medium far features
+	public static final int Q1_MED = 17;
+	public static final int Q2_MED = 18;
+	public static final int Q3_MED = 19;
+	public static final int Q4_MED = 20;
+	public static final int Q5_MED = 21;
+	public static final int Q6_MED = 22;
+	public static final int Q7_MED = 23;
+	public static final int Q8_MED = 24;
 
 	//Stuff *Come back and name this*
 	private static float prevMarioPos = 0;
@@ -187,42 +206,98 @@ public class FeatureExtractor {
     	return (ledgeInFront < ledgeBelow);
     }
 
-    public static boolean setEnemyClose(byte[][] enemyScene, double[][] features, int action){
-    	boolean enemyNear = false;
-    	for(int x = MARIO_LOCATION.x - CLOSE_ENEMY_RANGE; x < MARIO_LOCATION.x + CLOSE_ENEMY_RANGE; x ++)
-    	{
-    		for(int y = MARIO_LOCATION.y - CLOSE_ENEMY_RANGE; y < MARIO_LOCATION.y + CLOSE_ENEMY_RANGE; y ++)
-    		{
-    			if(x == MARIO_LOCATION.x ^ y == MARIO_LOCATION.y)
-    			{
-    				if(enemyScene[y][x] != 0)
-    				{
-    					if(y > MARIO_LOCATION.y )
-    					{
-    						features[action][ENEMY_BELOW] = 1;
-    					}
-    					if(y < MARIO_LOCATION.y )
-    					{
-    						features[action][ENEMY_ABOVE] = 1;
-    					}
-    					if(x < MARIO_LOCATION.x )
-    					{
-    						features[action][ENEMY_BEHIND] = 1;
-    					}
-    					if(x > MARIO_LOCATION.x )
-    					{
-    						features[action][ENEMY_FRONT] = 1;
-    					}
-    					enemyNear = true;
-    				}
-    			}
-    		}
+    public static void setEnemyClose(byte[][] enemyScene, double[][] features, int action){
+    	int x = MARIO_LOCATION.x;
+    	int y = MARIO_LOCATION.y;
+    	if(enemyScene[y][x + 1] != 0){
+    		features[action][Q1_CLOSE] = 1;
     	}
-    	return enemyNear;
+    	if(enemyScene[y +1][x + 1] != 0){
+    		features[action][Q2_CLOSE] = 1;
+    	}
+    	if(enemyScene[y + 1][x] != 0){
+    		features[action][Q3_CLOSE] = 1;
+    	}
+    	if(enemyScene[y + 1][x - 1] != 0){
+    		features[action][Q4_CLOSE] = 1;
+    	}
+    	if(enemyScene[y][x - 1] != 0){
+    		features[action][Q5_CLOSE] = 1;
+    	}
+    	if(enemyScene[y - 1][x - 1] != 0){
+    		features[action][Q6_CLOSE] = 1;
+    	}
+    	if(enemyScene[y - 1][x] != 0){
+    		features[action][Q7_CLOSE] = 1;
+    	}
+    	if(enemyScene[y - 1][x + 1] != 0){
+    		features[action][Q8_CLOSE] = 1;
+    	}
+    }
+
+    public static void setEnemyMed(byte[][] enemyScene, double[][] features, int action){
+    	int marioX = MARIO_LOCATION.x;
+    	int marioY = MARIO_LOCATION.y;
+    	//System.out.println("MEEp");
+    	for(int y = marioY - 2; y <= marioY + 2; y += 4){
+	    	for(int x = marioX - 2; x <= marioX + 2; x++){
+	    		//System.out.println("x: " + x + " y: " + y);
+	    		if(y == marioY - 2){
+	    			if (x >= marioX - 2 && x <= marioX - 1 && enemyScene[y][x] != 0){
+	    				features[action][Q4_MED] = 1;
+	    			} 
+	    			else if (x == marioX && enemyScene[y][x] != 0){
+	    				features[action][Q5_MED] = 1;
+	    			} 
+	    			else if(x > marioX && x <= marioX + 2 && enemyScene[y][x] != 0){
+	    				features[action][Q2_MED] = 1;
+	    			}
+	    		} else{
+	    			if (x >= marioX - 2 && x <= marioX - 1 && enemyScene[y][x] != 0){
+	    				features[action][Q6_MED] = 1;
+	    			} 
+	    			else if (x == marioX && enemyScene[y][x] != 0){
+	    				features[action][Q7_MED] = 1;
+	    			} 
+	    			else if(x > marioX && x <= marioX + 2 && enemyScene[y][x] != 0){
+	    				features[action][Q8_MED] = 1;
+	    			}
+	    		}
+	    	}
+	    }
+	    //System.out.println("MOOp");
+	    for(int x = marioX - 2; x <= marioX + 2; x += 4){
+	    	for(int y = marioY - 1; y <= marioY + 1; y ++){
+	    		if(x == marioX - 2){
+	    			if(y == marioY - 1 && enemyScene[y][x] != 0 ){
+	    				features[action][Q4_MED] = 1;
+	    			}
+	    			else if(y == marioY && enemyScene[y][x] != 0 ){
+	    				features[action][Q5_MED] = 1;
+	    			}
+	    			else if(y == marioY + 1 && enemyScene[y][x] != 0 ){
+	    				features[action][Q6_MED] = 1;
+	    			}
+	    		}
+	    		else{
+	    			if(y == marioY - 1 && enemyScene[y][x] != 0 ){
+	    				features[action][Q2_MED] = 1;
+	    			}
+	    			else if(y == marioY && enemyScene[y][x] != 0 ){
+	    				features[action][Q1_MED] = 1;
+	    			}
+	    			else if(y == marioY + 1 && enemyScene[y][x] != 0 ){
+	    				features[action][Q8_MED] = 1;
+	    			}
+	    		}
+	    	}
+	    }
     }
 
 	public static double[][] extractFeatures(Environment observation, int action) {
-		//print2dLevel(observation.getLevelSceneObservation());
+		/*System.out.println("__________________");
+		print2dLevel(observation.getLevelSceneObservation());
+		System.out.println("__________________");*/
 		double[][] features = new double[NUM_ACTIONS][NUM_FEATURES];
 		for(int curAction = 0; curAction < NUM_ACTIONS; curAction++)
 		{
@@ -268,11 +343,9 @@ public class FeatureExtractor {
 
 		//Enemy proximity features
 		byte [][] enemyScene = observation.getEnemiesObservation(); 
-		features[action][ENEMY_BELOW] = 0;
-		features[action][ENEMY_ABOVE] = 0;
-		features[action][ENEMY_BEHIND] = 0;
-		features[action][ENEMY_FRONT] = 0;
 		setEnemyClose(enemyScene, features, action);
+
+		setEnemyMed(enemyScene, features, action);
 
 
 
