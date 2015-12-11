@@ -187,8 +187,8 @@ public class HelloWorld extends BasicAIAgent implements Agent
         {
             System.out.println("MODE CHANGE WOW: ");
         }
-        double killsScore = (observation.getKillsTotal() - kills) * KILLS_WEIGHT;
-        kills = observation.getKillsTotal();
+        double killsScore = (observation.getKillsByStomp() - kills) * KILLS_WEIGHT;
+        kills = observation.getKillsByStomp();
         double marioProgressScore = (observation.getMarioFloatPos()[0] - prevXPos - 1) * PROGRESS_WEIGHT;
         if(prevXPos > observation.getMarioFloatPos()[0]){
             marioProgressScore *= 3;
