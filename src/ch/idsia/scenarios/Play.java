@@ -20,7 +20,7 @@ public class Play {
     public static void main(String[] args) {
         boolean observe = true;
         Agent controller = new HumanKeyboardAgent();
-        boolean maxSpeed = false;
+        boolean maxSpeed = true;
         int difficulty = 0;
         if (args.length > 0) {
             controller = AgentsPool.load (args[0]);
