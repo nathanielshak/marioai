@@ -18,9 +18,9 @@ import ch.idsia.mario.engine.sprites.Mario;
 public class Play {
 
     public static void main(String[] args) {
-        boolean observe = false;
+        boolean observe = true;
         Agent controller = new HumanKeyboardAgent();
-        boolean maxSpeed = true;
+        boolean maxSpeed = false;
         int difficulty = 0;
         if (args.length > 0) {
             controller = AgentsPool.load (args[0]);
@@ -37,7 +37,7 @@ public class Play {
         EvaluationOptions options = new CmdLineOptions(new String[0]);
         options.setAgent(controller);
         Task task = new ProgressTask(options);
-        options.setMaxFPS(!observe);
+        options.setMaxFPS(maxSpeed);
         options.setVisualization(observe);
         options.setNumberOfTrials(numTrials);
         options.setMatlabFileName("");
@@ -46,8 +46,8 @@ public class Play {
         for(int i = 0; i < numTrials; i++){
             options.setLevelRandSeed((int) (Math.random () * Integer.MAX_VALUE));
 
-            System.out.println ("Score: " + task.evaluate (controller)[0]);
-            System.out.println(task.evalInfo().marioStatus);
+            System.out.println (task.evaluate (controller)[0] + ",");
+            //System.out.println(task.evalInfo().marioStatus);
             
             controller.signalStatus(task.evalInfo().marioStatus);
         }
