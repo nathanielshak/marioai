@@ -84,7 +84,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
         }
 
 
-        //System.out.println(Arrays.deepToString(weights));
+        System.out.println(Arrays.deepToString(weights));
 
     }
 
@@ -104,7 +104,7 @@ public class HelloWorld extends BasicAIAgent implements Agent
         dead = false;
         //print2dArray(weights);
         if(training){
-            System.out.println(Arrays.deepToString(weights));
+            //System.out.println(Arrays.deepToString(weights));
         }
         
         //randomRange ++;
