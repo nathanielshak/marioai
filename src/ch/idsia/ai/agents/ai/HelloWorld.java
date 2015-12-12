@@ -378,6 +378,15 @@ public class HelloWorld extends BasicAIAgent implements Agent
             }
             
         }
+
+        //hold actions while in air, so that prev obv stays how it was
+        if(!observation.isMarioOnGround()){
+            prevXPos = observation.getMarioFloatPos()[0] + JUMP_X_BIAS;
+            setAction(prevAction);
+            System.out.println("HOOOOOOLD");
+            return action;
+        }
+
         //System.out.println("WE NOT JUMPING");
         if(prevObv == null)
         { //first action
